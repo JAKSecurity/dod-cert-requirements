@@ -69,3 +69,27 @@ Against this recommendation: **do not** pursue (E) silently — it contradicts t
 ## What remains safe to proceed on
 
 - Tasks 2.1, 2.2, 2.4, 2.5 — all format-agnostic. They operate on the canonical JSON representation and work on the Jan 2025 xlsx input regardless of how we later obtain the "new" side for comparison.
+
+## Unblock — 2026-04-18 update
+
+Jeff successfully downloaded the V2.1 xlsx from the new www.cyber.mil page on a second attempt (first attempt failed due to what looked like a transient Salesforce hiccup). File: `8140/sources/dod8140-matrix-v2.1-20250919.xlsx` (277 KB, 10 sheets). A V2.0 companion file is also preserved at `8140/sources/unclass-dod8140qualmatrix.xlsx`.
+
+**Format for extraction:** the V2.1 `Certification Repository` sheet is a flat table — columns `WRC | Work Role Title | Element | Acronym | Proficiency | Vendor`, 428 rows covering all certification options across every V2.1 work role. This is materially easier to parse than the old HTML tables — no scraping, no DOM rendering, just openpyxl on a column-stable sheet.
+
+## Locked decisions (2026-04-18)
+
+**Source of truth:** V2.1 `Certification Repository` sheet. Other sheets (DoD Training Repository, Matrix Tool - Approved, Reference) are context, not extraction sources.
+
+**Scope: certification path only.** V2.1 formalizes four foundational qualification paths (Education / DoD Military Training / Commercial Training / Personnel Certification) plus an Experience alternative. This repo stays bounded to the **certification path** — in practice the route 99% of people take when they don't already have the degree, and the original focus of Jeff's spreadsheet.
+
+**Role scope: all V2.1 roles.** Every work role that appears in the V2.1 Certification Repository (spanning Cyber Effects, Intel, IT, Cybersecurity, Cyber Enablers). Expands beyond the ~35 Jan 2025 scope. Source data is cheap, matrix scales naturally, avoids the "why isn't role X here?" question.
+
+**Refresh strategy: build a fresh xlsx, not patch Jan 2025.** The V2.1 structure differs from Jan 2025 enough that cell-by-cell patching produces a misaligned hybrid. Instead, we generate a clean xlsx from V2.1 data using Jan 2025 as the **visual template** (same tab structure — Explanation, per-role summary, pivot view — same column/row layout, same styling). Jan 2025 xlsx remains input only for the informational CHANGELOG diff.
+
+**DoD Training Repository: skip.** Out of scope for this repo's audience.
+
+**Explanation tab: Jeff rewrites.** V2.1 paradigm (four qualification paths, new CPD requirements, expanded role universe) calls for a voice Jeff owns rather than a mechanical regeneration.
+
+## Implication for the Phase 2/3 pipeline
+
+The plan's original `apply_changelog.py` (cell-patch the Jan 2025 xlsx) becomes obsolete. Replaced by `build_refreshed_xlsx.py` (generate fresh xlsx from V2.1 data + visual template). The extract/normalize/diff/changelog chain survives — diff produces an **informational CHANGELOG** showing "what's changed since your Jan 2025 view," useful for readers who want provenance but not driving the build step.
