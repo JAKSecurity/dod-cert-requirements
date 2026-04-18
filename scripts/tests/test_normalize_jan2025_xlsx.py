@@ -59,6 +59,18 @@ def test_blank_cell_produces_empty_cert_list():
     assert ed_inter_411.certs == []
 
 
+def test_literal_blank_marker_treated_as_empty():
+    # Jeff's real xlsx uses the literal string '<blank>' in 40 cells to mean
+    # "no certs at this level" — normalizer must treat this as empty.
+    from scripts.normalize_jan2025_xlsx import _split_certs
+    assert _split_certs("<blank>") == []
+    assert _split_certs("<BLANK>") == []
+    assert _split_certs("  <blank>  ") == []
+    assert _split_certs("TBD") == []
+    assert _split_certs("N/A") == []
+    assert _split_certs("-") == []
+
+
 def test_role_name_captured_without_code():
     records = normalize_xlsx(FIXTURE)
     r411 = next(r for r in records if r.work_role_code == "411")

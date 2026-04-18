@@ -30,11 +30,20 @@ COL_CERT_INTER = 6
 COL_CERT_ADV = 7
 
 
+NO_CONTENT_MARKERS = {"", "TBD", "<BLANK>", "N/A", "NA", "-"}
+
+
 def _split_certs(cell_value: object) -> list[str]:
+    """Split a cert-list cell into a list of cert names.
+
+    Treat as empty: None, blank strings, and explicit no-content markers
+    like 'TBD', '<blank>', 'N/A' (Jeff's spreadsheet uses '<blank>' as an
+    intentional "no certs at this level" marker — 40 cells).
+    """
     if cell_value is None:
         return []
     s = str(cell_value).strip()
-    if not s or s.upper() == "TBD":
+    if s.upper() in NO_CONTENT_MARKERS:
         return []
     return [c.strip() for c in s.split(",") if c.strip()]
 
