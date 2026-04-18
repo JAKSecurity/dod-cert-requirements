@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en-US" class="html_stretched responsive av-preloader-disabled av-custom-lightbox  html_header_top html_logo_left html_main_nav_header html_menu_right html_slim html_header_sticky html_header_shrinking_disabled html_header_topbar_active html_mobile_menu_tablet html_header_searchicon html_content_align_center html_header_unstick_top_disabled html_header_stretch html_minimal_header html_minimal_header_shadow html_av-overlay-side html_av-overlay-side-classic html_av-submenu-noclone html_entry_id_171 av-no-preview html_text_menu_active ">
+<head>
+<meta charset="UTF-8" />
+<meta name="robots" content="index, follow" />
+
+
+<!-- mobile setting -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<!-- Scripts/CSS and wp_head hook -->
+<title>DoD Approved 8570 Baseline Certifications &#8211; DoD Cyber Exchange</title>
+<meta name='robots' content='max-image-preview:large' />
+<link rel='dns-prefetch' href='//s.w.org' />
+<link rel="alternate" type="application/rss+xml" title="DoD Cyber Exchange &raquo; Feed" href="https://public.cyber.mil/feed/" />
+<link rel="alternate" type="application/rss+xml" title="DoD Cyber Exchange &raquo; Comments Feed" href="https://public.cyber.mil/comments/feed/" />
+
+<!-- google webfont font replacement -->
+<link rel='stylesheet' id='avia-google-webfont' href='//fonts.googleapis.com/css?family=Lato:300,400,700' type='text/css' media='all'/> 
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/13.1.0\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/13.1.0\/svg\/","svgExt":".svg","source":{"wpemoji":"https:\/\/public.cyber.mil\/wp-includes\/js\/wp-emoji.js?ver=5.8.4","twemoji":"https:\/\/public.cyber.mil\/wp-includes\/js\/twemoji.js?ver=5.8.4"}};
+			/**
+ * @output wp-includes/js/wp-emoji-loader.js
+ */
+
+( function( window, document, settings ) {
+	var src, ready, ii, tests;
+
+	// Create a canvas element for testing native browser support of emoji.
+	var canvas = document.createElement( 'canvas' );
+	var context = canvas.getContext && canvas.getContext( '2d' );
+
+	/**
+	 * Checks if two sets of Emoji characters render the same visually.
+	 *
+	 * @since 4.9.0
+	 *
+	 * @private
+	 *
+	 * @param {number[]} set1 Set of Emoji character codes.
+	 * @param {number[]} set2 Set of Emoji character codes.
+	 *
+	 * @return {boolean} True if the two sets render the same.
+	 */
+	function emojiSetsRenderIdentically( set1, set2 ) {
+		var stringFromCharCode = String.fromCharCode;
+
+		// Cleanup from previous test.
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+		context.fillText( stringFromCharCode.apply( this, set1 ), 0, 0 );
+		var rendered1 = canvas.toDataURL();
+
+		// Cleanup from previous test.
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+		context.fillText( stringFromCharCode.apply( this, set2 ), 0, 0 );
+		var rendered2 = canvas.toDataURL();
+
+		return rendered1 === rendered2;
+	}
+
+	/**
+	 * Detects if the browser supports rendering emoji or flag emoji.
+	 *
+	 * Flag emoji are a single glyph made of two characters, so some browsers
+	 * (notably, Firefox OS X) don't support them.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @private
+	 *
+	 * @param {string} type Whether to test for support of "flag" or "emoji".
+	 *
+	 * @return {boolean} True if the browser can render emoji, false if it cannot.
+	 */
+	function browserSupportsEmoji( type ) {
+		var isIdentical;
+
+		if ( ! context || ! context.fillText ) {
+			return false;
+		}
+
+		/*
+		 * Chrome on OS X added native emoji rendering in M41. Unfortunately,
+		 * it doesn't work when the font is bolder than 500 weight. So, we
+		 * check for bold rendering support to avoid invisible emoji in Chrome.
+		 */
+		context.textBaseline = 'top';
+		context.font = '600 32px Arial';
+
+		switch ( type ) {
+			case 'flag':
+				/*
+				 * Test for Transgender flag compatibility. This flag is shortlisted for the Emoji 13 spec,
+				 * but has landed in Twemoji early, so we can add support for it, too.
+				 *
+				 * To test for support, we try to render it, and compare the rendering to how it would look if
+				 * the browser doesn't render it correctly (white flag emoji + transgender symbol).
+				 */
+				isIdentical = emojiSetsRenderIdentically(
+					[ 0x1F3F3, 0xFE0F, 0x200D, 0x26A7, 0xFE0F ],
+					[ 0x1F3F3, 0xFE0F, 0x200B, 0x26A7, 0xFE0F ]
+				);
+
+				if ( isIdentical ) {
+					return false;
+				}
+
+				/*
+				 * Test for UN flag compatibility. This is the least supported of the letter locale flags,
+				 * so gives us an easy test for full support.
+				 *
+				 * To test for support, we try to render it, and compare the rendering to how it would look if
+				 * the browser doesn't render it correctly ([U] + [N]).
+				 */
+				isIdentical = emojiSetsRenderIdentically(
+					[ 0xD83C, 0xDDFA, 0xD83C, 0xDDF3 ],
+					[ 0xD83C, 0xDDFA, 0x200B, 0xD83C, 0xDDF3 ]
+				);
+
+				if ( isIdentical ) {
+					return false;
+				}
+
+				/*
+				 * Test for English flag compatibility. England is a country in the United Kingdom, it
+				 * does not have a two letter locale code but rather an five letter sub-division code.
+				 *
+				 * To test for support, we try to render it, and compare the rendering to how it would look if
+				 * the browser doesn't render it correctly (black flag emoji + [G] + [B] + [E] + [N] + [G]).
+				 */
+				isIdentical = emojiSetsRenderIdentically(
+					[ 0xD83C, 0xDFF4, 0xDB40, 0xDC67, 0xDB40, 0xDC62, 0xDB40, 0xDC65, 0xDB40, 0xDC6E, 0xDB40, 0xDC67, 0xDB40, 0xDC7F ],
+					[ 0xD83C, 0xDFF4, 0x200B, 0xDB40, 0xDC67, 0x200B, 0xDB40, 0xDC62, 0x200B, 0xDB40, 0xDC65, 0x200B, 0xDB40, 0xDC6E, 0x200B, 0xDB40, 0xDC67, 0x200B, 0xDB40, 0xDC7F ]
+				);
+
+				return ! isIdentical;
+			case 'emoji':
+				/*
+				 * Burning Love: Just a hunk, a hunk of burnin' love.
+				 *
+				 *  To test for Emoji 13.1 support, try to render a new emoji: Heart on Fire!
+				 *
+				 * The Heart on Fire emoji is a ZWJ sequence combining ❤️ Red Heart, a Zero Width Joiner and 🔥 Fire.
+				 *
+				 * 0x2764, 0xfe0f == Red Heart emoji.
+				 * 0x200D == Zero-Width Joiner (ZWJ) that links the two code points for the new emoji or
+				 * 0x200B == Zero-Width Space (ZWS) that is rendered for clients not supporting the new emoji.
+				 * 0xD83D, 0xDD25 == Fire.
+				 *
+				 * When updating this test for future Emoji releases, ensure that individual emoji that make up the
+				 * sequence come from older emoji standards.
+				 */
+				isIdentical = emojiSetsRenderIdentically(
+					[0x2764, 0xfe0f, 0x200D, 0xD83D, 0xDD25],
+					[0x2764, 0xfe0f, 0x200B, 0xD83D, 0xDD25]
+				);
+
+				return ! isIdentical;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Adds a script to the head of the document.
+	 *
+	 * @ignore
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param {Object} src The url where the script is located.
+	 * @return {void}
+	 */
+	function addScript( src ) {
+		var script = document.createElement( 'script' );
+
+		script.src = src;
+		script.defer = script.type = 'text/javascript';
+		document.getElementsByTagName( 'head' )[0].appendChild( script );
+	}
+
+	tests = Array( 'flag', 'emoji' );
+
+	settings.supports = {
+		everything: true,
+		everythingExceptFlag: true
+	};
+
+	/*
+	 * Tests the browser support for flag emojis and other emojis, and adjusts the
+	 * support settings accordingly.
+	 */
+	for( ii = 0; ii < tests.length; ii++ ) {
+		settings.supports[ tests[ ii ] ] = browserSupportsEmoji( tests[ ii ] );
+
+		settings.supports.everything = settings.supports.everything && settings.supports[ tests[ ii ] ];
+
+		if ( 'flag' !== tests[ ii ] ) {
+			settings.supports.everythingExceptFlag = settings.supports.everythingExceptFlag && settings.supports[ tests[ ii ] ];
+		}
+	}
+
+	settings.supports.everythingExceptFlag = settings.supports.everythingExceptFlag && ! settings.supports.flag;
+
+	// Sets DOMReady to false and assigns a ready function to settings.
+	settings.DOMReady = false;
+	settings.readyCallback = function() {
+		settings.DOMReady = true;
+	};
+
+	// When the browser can not render everything we need to load a polyfill.
+	if ( ! settings.supports.everything ) {
+		ready = function() {
+			settings.readyCallback();
+		};
+
+		/*
+		 * Cross-browser version of adding a dom ready event.
+		 */
+		if ( document.addEventListener ) {
+			document.addEventListener( 'DOMContentLoaded', ready, false );
+			window.addEventListener( 'load', ready, false );
+		} else {
+			window.attachEvent( 'onload', ready );
+			document.attachEvent( 'onreadystatechange', function() {
+				if ( 'complete' === document.readyState ) {
+					settings.readyCallback();
+				}
+			} );
+		}
+
+		src = settings.source || {};
+
+		if ( src.concatemoji ) {
+			addScript( src.concatemoji );
+		} else if ( src.wpemoji && src.twemoji ) {
+			addScript( src.twemoji );
+			addScript( src.wpemoji );
+		}
+	}
+
+} )( window, document, window._wpemojiSettings );
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+	<link rel='stylesheet' id='toolset-common-es-css'  href='https://public.cyber.mil/wp-content/plugins/toolset-blocks/vendor/toolset/common-es/public/toolset-common-es.css?ver=122000' type='text/css' media='all' />
+<link rel='stylesheet' id='toolset_blocks-style-css-css'  href='https://public.cyber.mil/wp-content/plugins/toolset-blocks/vendor/toolset/blocks/public/css/style.css?ver=1.1.3' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-grid-css'  href='https://public.cyber.mil/wp-content/themes/enfold/css/grid.css?ver=4.2.6' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-base-css'  href='https://public.cyber.mil/wp-content/themes/enfold/css/base.css?ver=4.2.6' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-layout-css'  href='https://public.cyber.mil/wp-content/themes/enfold/css/layout.css?ver=4.2.6' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-button-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/buttons/buttons.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-button-fullwidth-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/buttons_fullwidth/buttons_fullwidth.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-catalogue-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/catalogue/catalogue.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-contact-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/contact/contact.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-countdown-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/countdown/countdown.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-hr-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/hr/hr.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-icon-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/icon/icon.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-iconbox-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/iconbox/iconbox.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-iconlist-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/iconlist/iconlist.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-numbers-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/numbers/numbers.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-portfolio-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/portfolio/portfolio.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-module-table-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/table/table.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-modfule-notification-css'  href='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/notification/notification.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='toolset_bootstrap_4-css'  href='https://public.cyber.mil/wp-content/plugins/toolset-blocks/vendor/toolset/toolset-common/res/lib/bootstrap4/css/bootstrap.css?ver=4.3.1' type='text/css' media='screen' />
+<link rel='stylesheet' id='wp-block-library-css'  href='https://public.cyber.mil/wp-includes/css/dist/block-library/style.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='view_editor_gutenberg_frontend_assets-css'  href='https://public.cyber.mil/wp-content/plugins/toolset-blocks/public/css/views-frontend.css?ver=3.1.3' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-disclaimer-popup-css'  href='https://public.cyber.mil/wp-content/plugins/disclaimer-popup/public/css/wp-disclaimer-popup-public.css?ver=1.1.2' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-disclaimer-popup-gen-css'  href='https://public.cyber.mil/wp-content/plugins/disclaimer-popup/public/css/wp-disclaimer-popup-public.gen.css?ver=1.1.2' type='text/css' media='all' />
+<link rel='stylesheet' id='magnific-popup-css'  href='https://public.cyber.mil/wp-content/plugins/disclaimer-popup/public/css/magnific-popup.css?ver=1.1.2' type='text/css' media='all' />
+<link rel='stylesheet' id='exit_notifier-frontend-css'  href='https://public.cyber.mil/wp-content/plugins/exit-notifier/assets/css/frontend.css?ver=1.6.2' type='text/css' media='all' />
+<link rel='stylesheet' id='exit_notifier-jAlert-css'  href='https://public.cyber.mil/wp-content/plugins/exit-notifier/assets/css/jAlert.min.css?ver=1.6.2' type='text/css' media='all' />
+<link rel='stylesheet' id='dashicons-css'  href='https://public.cyber.mil/wp-includes/css/dashicons.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='post-views-counter-frontend-css'  href='https://public.cyber.mil/wp-content/plugins/post-views-counter/css/frontend.css?ver=1.3.1' type='text/css' media='all' />
+<link rel='stylesheet' id='mediaelement-css'  href='https://public.cyber.mil/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.16' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-mediaelement-css'  href='https://public.cyber.mil/wp-includes/js/mediaelement/wp-mediaelement.css?ver=5.8.4' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-scs-css'  href='https://public.cyber.mil/wp-content/themes/enfold/css/shortcodes.css?ver=4.2.6' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-popup-css-css'  href='https://public.cyber.mil/wp-content/themes/enfold/js/aviapopup/magnific-popup.css?ver=4.2.6' type='text/css' media='screen' />
+<link rel='stylesheet' id='avia-print-css'  href='https://public.cyber.mil/wp-content/themes/enfold/css/print.css?ver=4.2.6' type='text/css' media='print' />
+<link rel='stylesheet' id='avia-dynamic-css'  href='https://public.cyber.mil/wp-content/uploads/dynamic_avia/iase.css?ver=63aef2ff7143f' type='text/css' media='all' />
+<link rel='stylesheet' id='avia-style-css'  href='https://public.cyber.mil/wp-content/themes/iase/style.css?ver=4.2.6' type='text/css' media='all' />
+<link rel='stylesheet' id='toolset-common-css'  href='https://public.cyber.mil/wp-content/plugins/toolset-blocks/vendor/toolset/toolset-common/res/css/toolset-common.css?ver=3.5.7' type='text/css' media='screen' />
+<link rel='stylesheet' id='elasticpress-facets-css'  href='https://public.cyber.mil/wp-content/plugins/elasticpress/features/facets/assets/css/facets.css?ver=2.8.2' type='text/css' media='all' />
+<link rel='stylesheet' id='tablepress-default-css'  href='https://public.cyber.mil/wp-content/plugins/tablepress/css/default.css?ver=1.14' type='text/css' media='all' />
+<link rel='stylesheet' id='views-pagination-style-css'  href='https://public.cyber.mil/wp-content/plugins/toolset-blocks/embedded/res/css/wpv-pagination.css?ver=3.1.3' type='text/css' media='all' />
+<style id='views-pagination-style-inline-css' type='text/css'>
+.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-default > span.wpv-sort-list,.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-default .wpv-sort-list-item {border-color: #cdcdcd;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-default .wpv-sort-list-item a {color: #444;background-color: #fff;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-default a:hover,.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-default a:focus {color: #000;background-color: #eee;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-default .wpv-sort-list-item.wpv-sort-list-current a {color: #000;background-color: #eee;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-grey > span.wpv-sort-list,.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-grey .wpv-sort-list-item {border-color: #cdcdcd;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-grey .wpv-sort-list-item a {color: #444;background-color: #eeeeee;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-grey a:hover,.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-grey a:focus {color: #000;background-color: #e5e5e5;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-grey .wpv-sort-list-item.wpv-sort-list-current a {color: #000;background-color: #e5e5e5;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-blue > span.wpv-sort-list,.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-blue .wpv-sort-list-item {border-color: #0099cc;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-blue .wpv-sort-list-item a {color: #444;background-color: #cbddeb;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-blue a:hover,.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-blue a:focus {color: #000;background-color: #95bedd;}.wpv-sort-list-dropdown.wpv-sort-list-dropdown-style-blue .wpv-sort-list-item.wpv-sort-list-current a {color: #000;background-color: #95bedd;}
+</style>
+<link rel='stylesheet' id='ubermenu-css'  href='https://public.cyber.mil/wp-content/plugins/ubermenu/pro/assets/css/ubermenu.min.css?ver=3.3.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='ubermenu-font-awesome-css'  href='https://public.cyber.mil/wp-content/plugins/ubermenu/assets/css/fontawesome/css/font-awesome.min.css?ver=4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='main-css-css'  href='https://public.cyber.mil/wp-content/themes/iase/css/main.css?ver=5.8.4' type='text/css' media='all' />
+<script type='text/javascript' src='https://public.cyber.mil/wp-includes/js/jquery/jquery.js?ver=3.6.0' id='jquery-core-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-includes/js/jquery/jquery-migrate.js?ver=3.3.2' id='jquery-migrate-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/disclaimer-popup/public/js/wp-disclaimer-popup-public.js?ver=1.1.2' id='wp-disclaimer-popup-js'></script>
+<script type='text/javascript' id='exit_notifier-frontend-js-extra'>
+/* <![CDATA[ */
+var ExitBoxSettings = {"exitbox_version":"1.6.2","siteroot":"public.cyber.mil","siteurl":"https:\/\/public.cyber.mil","title":"You are leaving the Cyber Exchange","body":"<p>The appearance of external hyperlinks does not constitute endorsement by the United States Department of Defense of the linked websites, or the information, products or services contained therein. Other than for authorized activities such as military exchanges and Morale, Welfare and Recreation sites, the United States Department of Defense does not exercise any editorial control over the information you may find at these locations.  For assistance with information found on external hyperlinks, you will need to reach out to the help sections found on the external website.<\/p> <p>All provided links are consistent with the mission of this website.<\/p> <p>To continue  please click <b>Leave the Cyber Exchange<\/b>. If this is in error, please click <b>Cancel<\/b>.<\/p>","GoButtonText":"Leave the Cyber Exchange","Include_URL":"","CancelButtonText":"Cancel","alt_title":"You are leaving the Cyber Exchange","alt_body":"<p>The appearance of external hyperlinks does not constitute endorsement by the United States Department of Defense of the linked websites, or the information, products or services contained therein. Other than for authorized activities such as military exchanges and Morale, Welfare and Recreation sites, the United States Department of Defense does not exercise any editorial control over the information you may find at these locations.<\/p> <p>All provided links are consistent with the mission of this website.<\/p> <p>To continue  please click <b>Leave the Cyber Exchange<\/b>. If this is in error, please click <b>Cancel<\/b>.<\/p>","alt_GoButtonText":"Leave Cyber Exchange","alt_Include_URL":"","alt_CancelButtonText":"Cancel","alt_classname":"altExitNotifier","activate_custom_content":"on","apply_to_all_offsite_links":"","jquery_selector_field":"a[href*=\"\/\/\"]:not(\"[href*='cyber.mil']\")","new_window":"on","enable_notifier_for_forms":"","apply_to_all_offsite_forms":"on","jquery_form_selector_field":"form[action*=\"\/\/\"]:not([action*=\"public.cyber.mil\"])","theme":"default","backgroundcolor":"black","blurbackground":"","size":"md","showAnimation":"fadeIn","hideAnimation":"fadeOut","visual":"","enable_timeout":"on","continue_or_cancel":"cancel","timeout_seconds":"60","enable_progressbar":"on","timeout_statement":"on","custom_css":"\nbackground: #0684ce;\nbackground: -moz-linear-gradient(top,  #0684ce 0%, #1e5799 100%);\nbackground: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#0684ce), color-stop(100%,#1e5799));\nbackground: -webkit-linear-gradient(top,  #0684ce 0%,#1e5799 100%);\nbackground: -o-linear-gradient(top,  #0684ce 0%,#1e5799 100%);\nbackground: -ms-linear-gradient(top,  #0684ce 0%,#1e5799 100%);\nbackground: linear-gradient(to bottom,  #0684ce 0%,#1e5799 100%);\nfilter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0684ce', endColorstr='#1e5799',GradientType=0 );\nborder: 3px solid #1e5799;\n\t\t\t","advanced_custom_css":"","addclasses":"","classestoadd":""};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/exit-notifier/assets/js/frontend.js?ver=1.6.2' id='exit_notifier-frontend-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/exit-notifier/assets/js/jAlert.min.js?ver=1.6.2' id='exit_notifier-jAlert.min-js'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://public.cyber.mil/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://public.cyber.mil/wp-includes/wlwmanifest.xml" /> 
+<link rel="canonical" href="https://public.cyber.mil/wid/cwmp/dod-approved-8570-baseline-certifications/" />
+<link rel='shortlink' href='https://public.cyber.mil/?p=171' />
+<link rel="alternate" type="application/json+oembed" href="https://public.cyber.mil/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fpublic.cyber.mil%2Fwid%2Fcwmp%2Fdod-approved-8570-baseline-certifications%2F" />
+<link rel="alternate" type="text/xml+oembed" href="https://public.cyber.mil/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fpublic.cyber.mil%2Fwid%2Fcwmp%2Fdod-approved-8570-baseline-certifications%2F&#038;format=xml" />
+<style id="ubermenu-custom-generated-css">
+/** UberMenu Custom Menu Styles (Customizer) **/
+/* main */
+ .ubermenu-main .ubermenu-item .ubermenu-submenu-drop { -webkit-transition-duration:.1s; -ms-transition-duration:.1s; transition-duration:.1s; }
+ .ubermenu-main .ubermenu-item.ubermenu-active > .ubermenu-submenu-drop.ubermenu-submenu-type-mega { overflow:visible; }
+ .ubermenu-main.ubermenu-transition-fade .ubermenu-item .ubermenu-submenu-drop { margin-top:0; }
+/* site_nav */
+ .ubermenu-site_nav.ubermenu-transition-fade .ubermenu-item .ubermenu-submenu-drop { margin-top:0; }
+
+
+/* Status: Loaded from Transient */
+
+</style><link rel="profile" href="http://gmpg.org/xfn/11" />
+<link rel="alternate" type="application/rss+xml" title="DoD Cyber Exchange RSS2 Feed" href="https://public.cyber.mil/feed/" />
+<link rel="pingback" href="https://public.cyber.mil/xmlrpc.php" />
+<!--[if lt IE 9]><script src="https://public.cyber.mil/wp-content/themes/enfold/js/html5shiv.js"></script><![endif]-->
+<link rel="icon" href="/wp-content/uploads/home/img/cyber-exchange.png" type="image/png">
+
+<!-- To speed up the rendering and to display the site as fast as possible to the user we include some styles and scripts for above the fold content inline -->
+<script type="text/javascript">'use strict';var avia_is_mobile=!1;if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)&&'ontouchstart' in document.documentElement){avia_is_mobile=!0;document.documentElement.className+=' avia_mobile '}
+else{document.documentElement.className+=' avia_desktop '};document.documentElement.className+=' js_active ';(function(){var e=['-webkit-','-moz-','-ms-',''],n='';for(var t in e){if(e[t]+'transform' in document.documentElement.style){document.documentElement.className+=' avia_transform ';n=e[t]+'transform'};if(e[t]+'perspective' in document.documentElement.style)document.documentElement.className+=' avia_transform3d '};if(typeof document.getElementsByClassName=='function'&&typeof document.documentElement.getBoundingClientRect=='function'&&avia_is_mobile==!1){if(n&&window.innerHeight>0){setTimeout(function(){var e=0,o={},a=0,t=document.getElementsByClassName('av-parallax'),i=window.pageYOffset||document.documentElement.scrollTop;for(e=0;e<t.length;e++){t[e].style.top='0px';o=t[e].getBoundingClientRect();a=Math.ceil((window.innerHeight+i-o.top)*0.3);t[e].style[n]='translate(0px, '+a+'px)';t[e].style.top='auto';t[e].className+=' enabled-parallax '}},50)}}})();</script><link rel="icon" href="https://public.cyber.mil/wp-content/uploads/home/img/cropped-DoD-Cyber-Exchange-Mark-1-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://public.cyber.mil/wp-content/uploads/home/img/cropped-DoD-Cyber-Exchange-Mark-1-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://public.cyber.mil/wp-content/uploads/home/img/cropped-DoD-Cyber-Exchange-Mark-1-180x180.png" />
+<meta name="msapplication-TileImage" content="https://public.cyber.mil/wp-content/uploads/home/img/cropped-DoD-Cyber-Exchange-Mark-1-270x270.png" />
+<style type='text/css'>
+@font-face {font-family: 'entypo-fontello'; font-weight: normal; font-style: normal;
+src: url('https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-template-builder/assets/fonts/entypo-fontello.eot');
+src: url('https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-template-builder/assets/fonts/entypo-fontello.eot?#iefix') format('embedded-opentype'), 
+url('https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-template-builder/assets/fonts/entypo-fontello.woff') format('woff'), 
+url('https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-template-builder/assets/fonts/entypo-fontello.ttf') format('truetype'), 
+url('https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-template-builder/assets/fonts/entypo-fontello.svg#entypo-fontello') format('svg');
+} #top .avia-font-entypo-fontello, body .avia-font-entypo-fontello, html body [data-av_iconfont='entypo-fontello']:before{ font-family: 'entypo-fontello'; }
+</style>
+<script src="https://public.cyber.mil/wp-content/themes/iase/js/jquery.scrollTo.js"></script>
+<script src="https://public.cyber.mil/wp-content/themes/iase/js/jquery.expanderlink.js"></script>
+<link  href="https://public.cyber.mil/wp-content/themes/iase/js/DataTables/datatables.css" rel="stylesheet" type="text/css" />
+<script src="https://public.cyber.mil/wp-content/themes/iase/js/DataTables/datatables.js"></script>
+<script src="https://public.cyber.mil/wp-content/themes/iase/js/DataTables/downloadTable.js"></script>
+
+<script>
+
+
+$(function(){
+	
+	//test js here but move to js/main.js
+	
+});
+
+</script>
+<style>
+.show_dev{display:none;}
+body.dev .show_dev{display:inherit;}
+
+.show_public{display:none;}
+body.public .show_public{display:inherit;}
+
+.show_nipr{display:none;}
+body.nipr .show_nipr{display:inherit;}
+
+.show_sipr{display:none;}
+body.sipr .show_sipr{display:inherit;}
+</style>
+
+</head>
+<body id="top" class="page-template page-template-interior page-template-interior-php page page-id-171 page-child parent-pageid-50209 stretched public lato  locale-en-us" itemscope="itemscope" itemtype="https://schema.org/WebPage" >
+
+	
+	<div id='wrap_all'>
+
+	
+<header id='header' class='all_colors header_color light_bg_color  av_header_top av_logo_left av_main_nav_header av_menu_right av_slim av_header_sticky av_header_shrinking_disabled av_header_stretch av_mobile_menu_tablet av_header_searchicon av_header_unstick_top_disabled av_minimal_header av_minimal_header_shadow av_bottom_nav_disabled  av_header_border_disabled'  role="banner" itemscope="itemscope" itemtype="https://schema.org/WPHeader" >
+
+		<div id='header_meta' class='container_wrap container_wrap_meta  av_secondary_right av_extra_header_active av_entry_id_171'>
+		
+			      <div class='container'>
+			      <nav class='sub_menu'  role="navigation" itemscope="itemscope" itemtype="https://schema.org/SiteNavigationElement" ><ul id="avia2-menu" class="menu"><li id="menu-item-search" class="noMobile menu-item menu-item-search-dropdown menu-item-avia-special">
+            <a href="?s=" data-avia-search-tooltip="
+
+&lt;form action=&quot;https://public.cyber.mil/&quot; id=&quot;searchform&quot; method=&quot;get&quot; class=&quot;av_disable_ajax_search&quot;&gt;
+	&lt;div&gt;
+		&lt;input type=&quot;submit&quot; value=&quot;&quot; id=&quot;searchsubmit&quot; class=&quot;button avia-font-entypo-fontello&quot; /&gt;
+		&lt;input type=&quot;text&quot; id=&quot;s&quot; name=&quot;s&quot; value=&quot;&quot; placeholder='Search' /&gt;
+			&lt;/div&gt;
+&lt;/form&gt;" aria-hidden='true' data-av_icon='' data-av_iconfont='entypo-fontello'><span class="avia_hidden_link_text">Search</span></a>
+               </li><li id="menu-item-710" class="login-btn menu-item menu-item-type-custom menu-item-object-custom menu-item-710"><a href="https://cyber.mil/">Login with CAC</a></li>
+</ul></nav>			      </div>
+		</div>
+
+		<div  id='header_main' class='container_wrap container_wrap_logo'>
+	
+        <div class='container av-logo-container'><div class='inner-container'><div class='logo'><a href='https://public.cyber.mil/'><img class='default_logo' height='100' width='300' src='/wp-content/themes/iase/img/DoD-Cyber-Exchange-LogoPUBLIC.png' srcset='/wp-content/themes/iase/img/DoD-Cyber-Exchange-LogoPUBLIC.png 1x, /wp-content/themes/iase/img/DoD-Cyber-Exchange-LogoPUBLIC@2x.png 2x' /><img class='alternate_logo' height='100' width='300' src='/wp-content/themes/iase/img/DoD-Cyber-Exchange-Logo-Footer-PUBLIC.png' srcset='/wp-content/themes/iase/img/DoD-Cyber-Exchange-Logo-Footer-PUBLIC.png 1x, /wp-content/themes/iase/img/DoD-Cyber-Exchange-Logo-Footer-PUBLIC@2x.png 2x' /></a></div>
+<!-- UberMenu [Configuration:main] [Theme Loc:avia] [Integration:api] -->
+<a class="ubermenu-responsive-toggle ubermenu-responsive-toggle-main ubermenu-skin-none ubermenu-loc-avia ubermenu-responsive-toggle-content-align-left ubermenu-responsive-toggle-align-full " data-ubermenu-target="ubermenu-main-8-avia-2"><i class="fa fa-bars"></i>Menu</a><nav id="ubermenu-main-8-avia-2" class="ubermenu ubermenu-nojs ubermenu-main ubermenu-menu-8 ubermenu-loc-avia ubermenu-responsive ubermenu-responsive-default ubermenu-responsive-collapse ubermenu-horizontal ubermenu-transition-shift ubermenu-trigger-hover ubermenu-skin-none  ubermenu-bar-align-full ubermenu-items-align-left ubermenu-disable-submenu-scroll ubermenu-sub-indicators ubermenu-retractors-responsive"><ul id="ubermenu-nav-main-8-avia" class="ubermenu-nav"><li id="menu-item-659" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-custom ubermenu-item-has-children ubermenu-advanced-sub ubermenu-item-659 ubermenu-item-level-0 ubermenu-column ubermenu-column-auto ubermenu-has-submenu-drop ubermenu-has-submenu-mega" data-ubermenu-trigger="click" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="#" tabindex="0"><span class="ubermenu-target-title ubermenu-target-text">Topics</span></a><div  class="ubermenu-submenu ubermenu-submenu-id-659 ubermenu-submenu-type-auto ubermenu-submenu-type-mega ubermenu-submenu-drop ubermenu-submenu-align-full_width ubermenu-submenu-retractor-top"  ><div class="ubermenu-retractor ubermenu-retractor-desktop"><i class="fa fa-times"></i></div><ul class="ubermenu-row ubermenu-row-id-659_auto_1 ubermenu-autoclear "><li id="menu-item-725" class="megamenu-label ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-725 ubermenu-item-auto ubermenu-item-header ubermenu-item-level-2 ubermenu-column ubermenu-column-auto" ><div class="ubermenu-content-block ubermenu-custom-content ubermenu-custom-content-padded"><h3>List of topics</h3></div></li></ul><ul class="ubermenu-row ubermenu-row-id-726 ubermenu-autoclear "><li class="  ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-has-children ubermenu-item-727 ubermenu-item-level-2 ubermenu-column ubermenu-column-1-3 ubermenu-has-submenu-stack ubermenu-item-type-column ubermenu-column-id-727"><ul  class="ubermenu-submenu ubermenu-submenu-id-727 ubermenu-submenu-type-stack"  ><li id="menu-item-2143" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-2143 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/cdes/"><span class="ubermenu-target-title ubermenu-target-text">Cross Domain Enterprise Service (CDES)</span></a></li><li id="menu-item-2150" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-2150 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/cyber-sam/"><span class="ubermenu-target-title ubermenu-target-text">Cyber Sam</span></a></li><li id="menu-item-34457" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-34457 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/dcs/"><span class="ubermenu-target-title ubermenu-target-text">Defense Collaboration Services (DCS)</span></a></li></ul></li><li class="  ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-has-children ubermenu-item-2178 ubermenu-item-level-2 ubermenu-column ubermenu-column-1-3 ubermenu-has-submenu-stack ubermenu-item-type-column ubermenu-column-id-2178"><ul  class="ubermenu-submenu ubermenu-submenu-id-2178 ubermenu-submenu-type-stack"  ><li id="menu-item-43496" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-43496 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/devsecops/"><span class="ubermenu-target-title ubermenu-target-text">DevSecOps Operational Container Scanning</span></a></li><li id="menu-item-2133" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-2133 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/dccs/"><span class="ubermenu-target-title ubermenu-target-text">DoD Cloud Computing Security</span></a></li><li id="menu-item-35503" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-35503 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/wid/cdp/dcysp/"><span class="ubermenu-target-title ubermenu-target-text">DoD Cyber Scholarship Program (DoD CySP)</span></a></li><li id="menu-item-35457" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-current-page-ancestor ubermenu-item-35457 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/wid/"><span class="ubermenu-target-title ubermenu-target-text">DoD Workforce Innovation Directorate</span></a></li></ul></li><li class="  ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-has-children ubermenu-item-2179 ubermenu-item-level-2 ubermenu-column ubermenu-column-1-3 ubermenu-has-submenu-stack ubermenu-item-type-column ubermenu-column-id-2179"><ul  class="ubermenu-submenu ubermenu-submenu-id-2179 ubermenu-submenu-type-stack"  ><li id="menu-item-2169" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-2169 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/connect/"><span class="ubermenu-target-title ubermenu-target-text">Enterprise Connections</span></a></li><li id="menu-item-50710" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-50710 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/gencyber/"><span class="ubermenu-target-title ubermenu-target-text">GenCyber</span></a></li><li id="menu-item-2189" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-2189 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/idam/"><span class="ubermenu-target-title ubermenu-target-text">Identity and Access Management (IdAM)</span></a></li><li id="menu-item-44664" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-44664 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/ncae-c/"><span class="ubermenu-target-title ubermenu-target-text">National Centers of Academic Excellence in Cybersecurity (NCAE-C)</span></a></li></ul></li></ul><div class="ubermenu-retractor ubermenu-retractor-mobile"><i class="fa fa-times"></i> Close</div></div></li><li id="menu-item-709" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-custom ubermenu-item-has-children ubermenu-advanced-sub ubermenu-item-709 ubermenu-item-level-0 ubermenu-column ubermenu-column-auto ubermenu-has-submenu-drop ubermenu-has-submenu-flyout" data-ubermenu-trigger="click" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="#" tabindex="0"><span class="ubermenu-target-title ubermenu-target-text">Training</span></a><div  class="ubermenu-submenu ubermenu-submenu-id-709 ubermenu-submenu-type-flyout ubermenu-submenu-drop ubermenu-submenu-align-left_edge_item ubermenu-submenu-retractor-top"  ><div class="ubermenu-retractor ubermenu-retractor-desktop"><i class="fa fa-times"></i></div><ul class="ubermenu-row ubermenu-row-id-709_auto_1 ubermenu-autoclear "><li id="menu-item-2122" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-2122 ubermenu-item-auto ubermenu-item-header ubermenu-item-level-2 ubermenu-column ubermenu-column-auto" ><div class="ubermenu-content-block ubermenu-custom-content ubermenu-custom-content-padded"><h3>Cyber Exchange Training</h3></div></li></ul><ul class="ubermenu-row ubermenu-row-id-2125 ubermenu-autoclear "><li class="  ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-has-children ubermenu-item-2223 ubermenu-item-level-2 ubermenu-column ubermenu-column-full ubermenu-has-submenu-drop ubermenu-has-submenu-flyout ubermenu-item-type-column ubermenu-column-id-2223"><ul  class="ubermenu-submenu ubermenu-submenu-id-2223 ubermenu-submenu-type-stack"  ><li id="menu-item-17339" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-17339 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/cyber-training/"><span class="ubermenu-target-title ubermenu-target-text">Training Overview</span></a></li><li id="menu-item-2111" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-2111 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/cyber-training/training-catalog/"><span class="ubermenu-target-title ubermenu-target-text">Training Catalog</span></a></li><li id="menu-item-2113" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-custom ubermenu-item-2113 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/training/cyber-awareness-challenge/"><span class="ubermenu-target-title ubermenu-target-text">Cyber Awareness Challenge</span></a></li><li id="menu-item-33150" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-33150 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/cyber-training/cybersecurity-training-troubleshooting-guide/"><span class="ubermenu-target-title ubermenu-target-text">Training Troubleshooting Guide</span></a></li></ul></li></ul><div class="ubermenu-retractor ubermenu-retractor-mobile"><i class="fa fa-times"></i> Close</div></div></li><li id="menu-item-661" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-custom ubermenu-item-has-children ubermenu-advanced-sub ubermenu-item-661 ubermenu-item-level-0 ubermenu-column ubermenu-column-auto ubermenu-has-submenu-drop ubermenu-has-submenu-flyout" data-ubermenu-trigger="click" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="#" tabindex="0"><span class="ubermenu-target-title ubermenu-target-text">PKI/PKE</span></a><div  class="ubermenu-submenu ubermenu-submenu-id-661 ubermenu-submenu-type-flyout ubermenu-submenu-drop ubermenu-submenu-align-left_edge_item ubermenu-submenu-retractor-top"  ><div class="ubermenu-retractor ubermenu-retractor-desktop"><i class="fa fa-times"></i></div><ul class="ubermenu-row ubermenu-row-id-661_auto_1 ubermenu-autoclear "><li id="menu-item-21153" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-21153 ubermenu-item-auto ubermenu-item-header ubermenu-item-level-2 ubermenu-column ubermenu-column-auto" ><div class="ubermenu-content-block ubermenu-custom-content ubermenu-custom-content-padded"><h3>Public Key Infrastructure/Enabling</h3></div></li></ul><ul class="ubermenu-row ubermenu-row-id-21154 ubermenu-autoclear "><li class="  ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-has-children ubermenu-item-21155 ubermenu-item-level-2 ubermenu-column ubermenu-column-auto ubermenu-has-submenu-drop ubermenu-has-submenu-flyout ubermenu-item-type-column ubermenu-column-id-21155"><ul  class="ubermenu-submenu ubermenu-submenu-id-21155 ubermenu-submenu-type-stack"  ><li id="menu-item-21156" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-21156 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/pki-pke/"><span class="ubermenu-target-title ubermenu-target-text">Public Key Infrastructure/Enabling (PKI/PKE)</span></a></li><li id="menu-item-50335" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-50335 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/eca/"><span class="ubermenu-target-title ubermenu-target-text">External Certification Authorities (ECA)</span></a></li></ul></li></ul><div class="ubermenu-retractor ubermenu-retractor-mobile"><i class="fa fa-times"></i> Close</div></div></li><li id="menu-item-33050" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-33050 ubermenu-item-level-0 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/stigs/" tabindex="0"><span class="ubermenu-target-title ubermenu-target-text">SRGs/STIGs</span></a></li><li id="menu-item-662" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-custom ubermenu-item-has-children ubermenu-advanced-sub ubermenu-item-662 ubermenu-item-level-0 ubermenu-column ubermenu-column-auto ubermenu-has-submenu-drop ubermenu-has-submenu-mega ubermenu-submenu-rtl" data-ubermenu-trigger="click" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="#" tabindex="0"><span class="ubermenu-target-title ubermenu-target-text">Resources</span></a><div  class="ubermenu-submenu ubermenu-submenu-id-662 ubermenu-submenu-type-auto ubermenu-submenu-type-mega ubermenu-submenu-drop ubermenu-submenu-align-right_edge_item ubermenu-submenu-retractor-top"  ><div class="ubermenu-retractor ubermenu-retractor-desktop"><i class="fa fa-times"></i></div><ul class="ubermenu-row ubermenu-row-id-662_auto_1 ubermenu-autoclear "><li id="menu-item-2129" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-2129 ubermenu-item-auto ubermenu-item-header ubermenu-item-level-2 ubermenu-column ubermenu-column-auto" ><div class="ubermenu-content-block ubermenu-custom-content ubermenu-custom-content-padded"><h3>List of Cyber Resources</h3></div></li></ul><ul class="ubermenu-row ubermenu-row-id-2130 ubermenu-autoclear "><li class="  ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-has-children ubermenu-item-2253 ubermenu-item-level-2 ubermenu-column ubermenu-column-1-2 ubermenu-has-submenu-stack ubermenu-item-type-column ubermenu-column-id-2253"><ul  class="ubermenu-submenu ubermenu-submenu-id-2253 ubermenu-submenu-type-stack"  ><li id="menu-item-6015" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-6015 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/about-cyber/"><span class="ubermenu-target-title ubermenu-target-text">About the DoD Cyber Exchange</span></a></li><li id="menu-item-2119" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-custom ubermenu-item-2119 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" target="_blank" href="https://aplits.disa.mil/apl"><span class="ubermenu-target-title ubermenu-target-text">Approved Products List (APL)</span></a></li><li id="menu-item-2245" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-2245 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/acronyms/"><span class="ubermenu-target-title ubermenu-target-text">Cybersecurity Acronyms</span></a></li><li id="menu-item-34930" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-34930 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/cybersecurity-awareness-month/"><span class="ubermenu-target-title ubermenu-target-text">Cybersecurity Awareness Month Archives</span></a></li></ul></li><li class="  ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-has-children ubermenu-item-2768 ubermenu-item-level-2 ubermenu-column ubermenu-column-1-2 ubermenu-has-submenu-stack ubermenu-item-type-column ubermenu-column-id-2768"><ul  class="ubermenu-submenu ubermenu-submenu-id-2768 ubermenu-submenu-type-stack"  ><li id="menu-item-34122" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-custom ubermenu-item-34122 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://dl.dod.cyber.mil/hidden/home/unclass-consent_banner.zip"><span class="ubermenu-target-title ubermenu-target-text">DoD Consent Banner with FAQ</span></a></li><li id="menu-item-2769" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-2769 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/external-resources/"><span class="ubermenu-target-title ubermenu-target-text">External Resources</span></a></li><li id="menu-item-3352" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-3352 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/policies-guidance/"><span class="ubermenu-target-title ubermenu-target-text">Policy and Guidance</span></a></li></ul></li></ul><div class="ubermenu-retractor ubermenu-retractor-mobile"><i class="fa fa-times"></i> Close</div></div></li><li id="menu-item-45585" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-custom ubermenu-item-has-children ubermenu-advanced-sub ubermenu-item-45585 ubermenu-item-level-0 ubermenu-column ubermenu-column-auto ubermenu-has-submenu-drop ubermenu-has-submenu-flyout ubermenu-submenu-rtl ubermenu-submenu-reverse" data-ubermenu-trigger="click" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="#" tabindex="0"><span class="ubermenu-target-title ubermenu-target-text">Help</span></a><div  class="ubermenu-submenu ubermenu-submenu-id-45585 ubermenu-submenu-type-flyout ubermenu-submenu-drop ubermenu-submenu-align-right_edge_item ubermenu-submenu-retractor-top"  ><div class="ubermenu-retractor ubermenu-retractor-desktop"><i class="fa fa-times"></i></div><ul class="ubermenu-row ubermenu-row-id-45585_auto_1 ubermenu-autoclear "><li id="menu-item-45586" class="ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-45586 ubermenu-item-auto ubermenu-item-header ubermenu-item-level-2 ubermenu-column ubermenu-column-auto" ><div class="ubermenu-content-block ubermenu-custom-content ubermenu-custom-content-padded"><h3>Cyber Exchange Help</h3></div></li></ul><ul class="ubermenu-row ubermenu-row-id-45587 ubermenu-autoclear "><li class="  ubermenu-item ubermenu-item-type-custom ubermenu-item-object-ubermenu-custom ubermenu-item-has-children ubermenu-item-45588 ubermenu-item-level-2 ubermenu-column ubermenu-column-full ubermenu-has-submenu-drop ubermenu-has-submenu-flyout ubermenu-item-type-column ubermenu-column-id-45588"><ul  class="ubermenu-submenu ubermenu-submenu-id-45588 ubermenu-submenu-type-stack"  ><li id="menu-item-45589" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-45589 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/email-directory/"><span class="ubermenu-target-title ubermenu-target-text">Email Directory</span></a></li><li id="menu-item-45590" class="ubermenu-item ubermenu-item-type-post_type ubermenu-item-object-page ubermenu-item-45590 ubermenu-item-auto ubermenu-item-normal ubermenu-item-level-3 ubermenu-column ubermenu-column-auto" ><a class="ubermenu-target ubermenu-item-layout-default ubermenu-item-layout-text_only" href="https://public.cyber.mil/faqs/"><span class="ubermenu-target-title ubermenu-target-text">Frequently Asked Questions (FAQs)</span></a></li></ul></li></ul><div class="ubermenu-retractor ubermenu-retractor-mobile"><i class="fa fa-times"></i> Close</div></div></li></ul></nav>
+<!-- End UberMenu -->
+</div> </div> 
+		<!-- end container_wrap-->
+		</div>
+		
+		<div class='header_bg'></div>
+
+<!-- end header -->
+</header>
+		
+	<div id='main' class='all_colors' data-scroll-offset='88'>
+
+	
+		 			 <div class="int-header" style="background: url(/wp-content/themes/iase/img/interior_header.jpg);background-size: cover;">
+			 	<div class="container">
+			 		<h1>DoD Approved 8570 Baseline Certifications</h1>
+			 	</div>
+			 </div>
+		 
+		 <div class="int-wrapper alb-enabled">
+			
+					 	<div class="int-side">
+				
+				<div class="int-side-header"><a href="https://public.cyber.mil/wid/">DoD Workforce Innovation Directorate</a></div>
+				
+				<div class="int-side-inner">
+										        <ul id="menu-cyber-workforce-cwmp" class="sf-menu"><li id="menu-item-34144" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34144"><a href="https://public.cyber.mil/cwmp/">8140 FAQ</a></li>
+<li id="menu-item-33450" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-33450"><a href="https://public.cyber.mil/wid/cwmp/documents-library/">Documents Library</a></li>
+<li id="menu-item-33453" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-171 current_page_item menu-item-33453"><a href="https://public.cyber.mil/wid/cwmp/dod-approved-8570-baseline-certifications/" aria-current="page">DoD Approved 8570 Baseline Certifications</a></li>
+<li id="menu-item-33457" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-33457"><a href="https://public.cyber.mil/wid/cwmp/cwmp-faqs/">Frequently Asked Questions - FAQs</a></li>
+<li id="menu-item-33451" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-33451"><a href="https://public.cyber.mil/wid/cwmp/steps-to-obtain-a-dod-8570-baseline-certification/">Steps to Obtain a DoD 8570 Baseline Certification</a></li>
+<li id="menu-item-33454" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-33454"><a href="https://public.cyber.mil/wid/cwmp/summary/">Summary of IA Workforce Qualification Requirements</a></li>
+<li id="menu-item-33455" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-33455"><a href="https://public.cyber.mil/knowledge-base/e-mail-cyber-workforce-management-program/">Help</a></li>
+<li id="menu-item-35613" class="menu-item menu-item-type-post_type menu-item-object-page current-page-ancestor menu-item-35613"><a href="https://public.cyber.mil/wid/">Workforce Innovation Directorate Home</a></li>
+<li id="menu-item-49231" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-49231"><a href="https://public.cyber.mil/wid/cwmp/dod-cyber-workforce-qualifications-matrices-management/">Qualifications Matrices</a></li>
+</ul>						
+				</div>
+				
+		 	</div>
+
+		 	<div class="int-content">
+
+			
+			<div id='av_section_1' class='avia-section main_color avia-section-default avia-no-border-styling avia-bg-style-scroll  avia-builder-el-0  avia-builder-el-no-sibling   container_wrap fullsize'   ><div class='container' ><main  role="main" itemprop="mainContentOfPage"  class='template-page content  av-content-full alpha units'><div class='post-entry post-entry-type-page post-entry-171'><div class='entry-content-wrapper clearfix'>
+<div class="breadcrumb breadcrumbs avia-breadcrumbs"><div class="breadcrumb-trail" xmlns:v="https://rdf.data-vocabulary.org/#"><a href="https://public.cyber.mil" title="DoD Cyber Exchange" rel="home" class="trail-begin">Home</a> <span class="sep">&raquo;</span> <span><a rel="v:url" property="v:title" href="https://public.cyber.mil/wid/" title="DoD Workforce Innovation Directorate">DoD Workforce Innovation Directorate</a></span> <span class="sep">&raquo;</span> <span><a rel="v:url" property="v:title" href="https://public.cyber.mil/wid/cwmp/" title="8140 FAQ">8140 FAQ</a></span> <span class="sep">&raquo;</span> <span class="trail-end">DoD Approved 8570 Baseline Certifications</span></div></div>
+<div  class='hr hr-default   avia-builder-el-2  el_after_av_breadcrumbs  el_before_av_textblock '><span class='hr-inner ' ><span class='hr-inner-style'></span></span></div>
+<section class="av_textblock_section "  itemscope="itemscope" itemtype="https://schema.org/CreativeWork" ><div class='avia_textblock  '   itemprop="text" ><p>As an extension of Appendix 3 to the DoD 8570.01-Manual, the following certifications have been approved as IA baseline certifications for the IA Workforce. Personnel performing IA functions must obtain one of the certifications required for their position category or specialty and level. Refer to Appendix 3 of 8570.01-M for further implementation guidance.</p>
+</div></section>
+<section class="av_textblock_section "  itemscope="itemscope" itemtype="https://schema.org/CreativeWork" ><div class='avia_textblock  '   itemprop="text" ><h3><center>Approved Baseline Certifications</center></h3>
+
+<table id="tablepress-iawip-approved_baseline_certifications" class="tablepress tablepress-id-iawip-approved_baseline_certifications">
+<tbody class="row-hover">
+<tr class="row-1 odd">
+	<td class="column-1"><center><strong>IAT Level I<sup>2</sup></strong></center></td><td class="column-2"><center><strong>IAT Level II<sup>2</sup></strong></center></td><td class="column-3"><center><strong>IAT Level III</strong></center></td>
+</tr>
+<tr class="row-2 even">
+	<td class="column-1">A+ CE<br />
+CCNA-Security<br />
+CND<br />
+Network+ CE<br />
+SSCP</td><td class="column-2">CCNA-Security<br />
+CySA+ **<br />
+GICSP<br />
+GSEC<br />
+Security+ CE<br />
+CND<br />
+SSCP</td><td class="column-3">CASP+ CE<br />
+CCNP Security<br />
+CISA<br />
+CISSP (or Associate)<br />
+GCED<br />
+GCIH<br />
+<font color="red">CCSP</font></td>
+</tr>
+<tr class="row-3 odd">
+	<td class="column-1"><center><strong>IAM Level I</strong></center></td><td class="column-2"><center><strong>IAM Level II</strong></center></td><td class="column-3"><center><strong>IAM Level III</strong></center></td>
+</tr>
+<tr class="row-4 even">
+	<td class="column-1">CAP<br />
+CND<br />
+Cloud+<br />
+GSLC<br />
+Security+ CE<br />
+<font color="red">HCISPP</font></td><td class="column-2">CAP<br />
+CASP+ CE<br />
+CISM<br />
+CISSP (or Associate)<br />
+GSLC<br />
+CCISO<br />
+<font color="red">HCISPP</font></td><td class="column-3">CISM<br />
+CISSP (or Associate)<br />
+GSLC<br />
+CCISO</td>
+</tr>
+<tr class="row-5 odd">
+	<td class="column-1"><center><strong>IASAE I</strong></center></td><td class="column-2"><center><strong>IASAE II</strong></center></td><td class="column-3"><center><strong>IASAE III</strong></center></td>
+</tr>
+<tr class="row-6 even">
+	<td class="column-1">CASP+ CE<br />
+CISSP (or Associate)<br />
+CSSLP</td><td class="column-2">CASP+ CE<br />
+CISSP (or Associate)<br />
+CSSLP</td><td class="column-3">CISSP-ISSAP<br />
+CISSP-ISSEP<br />
+<font color="red">CCSP</font></td>
+</tr>
+<tr class="row-7 odd">
+	<td class="column-1"><center><strong>CSSP Analyst<sup>1, 2</sup></strong></center></td><td class="column-2"><center><strong>CSSP Infrastructure Support<sup>1</sup></strong></center></td><td class="column-3"><center><strong>CSSP Incident Responder<sup>1, 2</sup></strong></center></td>
+</tr>
+<tr class="row-8 even">
+	<td class="column-1">CEH<br />
+CFR<br />
+CCNA Cyber Ops <br />
+CCNA-Security<br />
+CySA+ **<br />
+GCIA<br />
+GCIH<br />
+GICSP<br />
+Cloud+<br />
+SCYBER<br />
+PenTest+</td><td class="column-2">CEH<br />
+CySA+ **<br />
+GICSP<br />
+SSCP<br />
+CHFI<br />
+CFR<br />
+Cloud+<br />
+CND</td><td class="column-3">CEH<br />
+CFR<br />
+CCNA Cyber Ops <br />
+CCNA-Security<br />
+CHFI<br />
+CySA+ **<br />
+GCFA<br />
+GCIH<br />
+SCYBER<br />
+PenTest+</td>
+</tr>
+<tr class="row-9 odd">
+	<td class="column-1"><center><strong>CSSP Auditor<sup>1</sup></strong></center></td><td class="column-2"><center><strong>CSSP Manager<sup>1</sup></strong></center></td><td class="column-3"></td>
+</tr>
+<tr class="row-10 even">
+	<td class="column-1">CEH<br />
+CySA+ **<br />
+CISA<br />
+GSNA<br />
+CFR<br />
+PenTest</td><td class="column-2">CISM<br />
+CISSP-ISSMP<br />
+CCISO</td><td class="column-3"></td>
+</tr>
+</tbody>
+</table>
+<!-- #tablepress-iawip-approved_baseline_certifications from cache -->
+</div></section>
+<section class="av_textblock_section "  itemscope="itemscope" itemtype="https://schema.org/CreativeWork" ><div class='avia_textblock  '   itemprop="text" ><p>The above table provides a list of DoD approved IA baseline certifications aligned to each category and level of the IA Workforce. Personnel performing IA functions must obtain one of the certifications required for their position, category/specialty and level to fulfill the IA baseline certification requirement. Most IA levels within a category or specialty have more than one approved certification and a certification may apply to more than one level.</p>
+<p>An individual needs to obtain only one of the &#8220;approved certifications&#8221;; for his or her IA category or specialty and level to meet the minimum requirement. For example, an individual in an IAT Level II position could obtain any one of the four certifications listed in the IAT Level II cell.</p>
+<p>Higher level IAT and IAM certifications satisfy lower level requirements. Certifications listed in Level II or III cells can be used to qualify for Level I. However, Level I certifications cannot be used for Level II or III unless the certification is also listed in the Level II or III cell. For example:</p>
+<ul>
+<li>The A+ or Network+ certification qualify only for Technical Level I and cannot be used for Technical Level II positions.</li>
+<li>The System Security Certified Practitioner (SSCP) certification qualifies for both Technical Level I and Technical Level II. If the individual holding this certification moved from an IAT Level I to an IAT Level II position, he or she would not have to take a new certification.</li>
+</ul>
+<p>Higher level CCSP and IASAE certifications do not satisfy lower level requirements</p>
+<p>1. This category is equivalent to the CND-SP CATEGORY cited in the DoD 8570.01-M. The name was changed from CND-SP to CSSP to reflect current terminology in the DoD Instruction 8530.01 &#8220;Cybersecurity Activities Support to DoD Information Network Operations.</p>
+<p>2. CCNA-Security was retired by Cisco, modified, and rebranded as simply “CCNA.” If you possessed the CCNA-Security and were in a position that required that certification when it was retired, you may be eligible for a waiver to cite the rebranded CCNA as a qualifying baseline certification. See the DoD CIO CCNA Security Waiver on the DoD Cyber Workforce Documents website for additional information.</p>
+</div></section>
+<div  class='hr hr-default   avia-builder-el-6  el_after_av_textblock  el_before_av_textblock '><span class='hr-inner ' ><span class='hr-inner-style'></span></span></div>
+<section class="av_textblock_section "  itemscope="itemscope" itemtype="https://schema.org/CreativeWork" ><div class='avia_textblock  '   itemprop="text" ><p><strong>The table below lists the Certification Providers associated with each approved certification.</strong></p>
+<h3><center>IA Workforce Certification Providers</center></h3>
+
+<table id="tablepress-iawip-certification_providers" class="tablepress tablepress-id-iawip-certification_providers">
+<thead>
+<tr class="row-1 odd">
+	<th class="column-1">Certification Provider</th><th class="column-2">Certification Name</th>
+</tr>
+</thead>
+<tbody class="row-hover">
+<tr class="row-2 even">
+	<td class="column-1">CertNexus *</td><td class="column-2">CyberSec First Responder (CFR)</td>
+</tr>
+<tr class="row-3 odd">
+	<td class="column-1">Cisco *</td><td class="column-2">Cisco Certified Network Associate-Security (CCNA-Security)​</td>
+</tr>
+<tr class="row-4 even">
+	<td class="column-1">Cisco *</td><td class="column-2">Cisco Certified Network Professional-Security (CCNP-Security)​</td>
+</tr>
+<tr class="row-5 odd">
+	<td class="column-1">Cisco *</td><td class="column-2">Cybersecurity Specialty Certification (SCYBER)​</td>
+</tr>
+<tr class="row-6 even">
+	<td class="column-1">Computing Technology Industry Association (CompTIA) *</td><td class="column-2">A+ Continuing Education (CE)</td>
+</tr>
+<tr class="row-7 odd">
+	<td class="column-1">CompTIA *</td><td class="column-2">Cloud Plus (Cloud+)</td>
+</tr>
+<tr class="row-8 even">
+	<td class="column-1">CompTIA *</td><td class="column-2">Security+ Continuing Education (CE)</td>
+</tr>
+<tr class="row-9 odd">
+	<td class="column-1">CompTIA *</td><td class="column-2">CompTIA Advanced Security Practitioner (CASP) Continuing Education (CE)</td>
+</tr>
+<tr class="row-10 even">
+	<td class="column-1">CompTIA *</td><td class="column-2">Network+ Continuing Education (CE)</td>
+</tr>
+<tr class="row-11 odd">
+	<td class="column-1">CompTIA *</td><td class="column-2">Cybersecurity Analyst (CySA+ **)​</td>
+</tr>
+<tr class="row-12 even">
+	<td class="column-1">CompTIA * </td><td class="column-2">PenTest+</td>
+</tr>
+<tr class="row-13 odd">
+	<td class="column-1">EC-Council *</td><td class="column-2">Certified Ethical Hacker (CEH)</td>
+</tr>
+<tr class="row-14 even">
+	<td class="column-1">EC-Council *</td><td class="column-2">Certified Chief Information Security Officer (CCISO)</td>
+</tr>
+<tr class="row-15 odd">
+	<td class="column-1">EC-Council *</td><td class="column-2">Computer Hacking Forensics Investigator (CHFI)</td>
+</tr>
+<tr class="row-16 even">
+	<td class="column-1">EC-Council *</td><td class="column-2">Certified Network Defender (CND)</td>
+</tr>
+<tr class="row-17 odd">
+	<td class="column-1">International Information Systems Security Certifications Consortium (ISC)2 *</td><td class="column-2">Certified Information Systems Security Professional (CISSP) (or Associate - this means the individual has qualified for the certification except for the number of years experience)</td>
+</tr>
+<tr class="row-18 even">
+	<td class="column-1">(ISC)2 *</td><td class="column-2">Certified Secure Software Lifecycle Professional (CSSLP)​</td>
+</tr>
+<tr class="row-19 odd">
+	<td class="column-1">(ISC)2 *</td><td class="column-2">Certification Authorization Professional (CAP)</td>
+</tr>
+<tr class="row-20 even">
+	<td class="column-1">(ISC)2 *</td><td class="column-2">Information Systems Security Architecture Professional (ISSAP)</td>
+</tr>
+<tr class="row-21 odd">
+	<td class="column-1">(ISC)2 *</td><td class="column-2">Information Systems Security Engineering Professional (ISSEP)</td>
+</tr>
+<tr class="row-22 even">
+	<td class="column-1">(ISC)2 *</td><td class="column-2">Information Systems Security Management Professional (ISSMP)</td>
+</tr>
+<tr class="row-23 odd">
+	<td class="column-1">(ISC)2 *</td><td class="column-2">System Security Certified Practitioner (SSCP)</td>
+</tr>
+<tr class="row-24 even">
+	<td class="column-1"><font color="red">(ISC)2 *</font></td><td class="column-2"><font color="red">Certified Cloud Security Professional (CCSP)</font></td>
+</tr>
+<tr class="row-25 odd">
+	<td class="column-1"><font color="red">(ISC)2 *</font></td><td class="column-2"><font color="red">Health Care Information Security and Privacy Practitioner (HCISPP)</font></td>
+</tr>
+<tr class="row-26 even">
+	<td class="column-1">Information Systems Audit and Control Association (ISACA) *</td><td class="column-2">Certified Information Security Manager (CISM)</td>
+</tr>
+<tr class="row-27 odd">
+	<td class="column-1">ISACA *</td><td class="column-2">Certified Information Systems Auditor (CISA)</td>
+</tr>
+<tr class="row-28 even">
+	<td class="column-1">Global Information Assurance Certification (GIAC) *</td><td class="column-2">GIAC Certified Intrusion Analyst (GCIA)</td>
+</tr>
+<tr class="row-29 odd">
+	<td class="column-1">GIAC *</td><td class="column-2">GIAC Certified Enterprise Defender (GCED)</td>
+</tr>
+<tr class="row-30 even">
+	<td class="column-1">GIAC *</td><td class="column-2">GIAC Certified Forensic Analyst (GCFA)</td>
+</tr>
+<tr class="row-31 odd">
+	<td class="column-1">GIAC *</td><td class="column-2">GIAC Certified Incident Handler (GCIH)</td>
+</tr>
+<tr class="row-32 even">
+	<td class="column-1">GIAC *</td><td class="column-2">GIAC Global Industrial Cyber Security Professional (GICSP)​</td>
+</tr>
+<tr class="row-33 odd">
+	<td class="column-1">GIAC *</td><td class="column-2">GIAC Security Essentials Certification (GSEC)</td>
+</tr>
+<tr class="row-34 even">
+	<td class="column-1">GIAC *</td><td class="column-2">GIAC Security Leadership Certificate (GSLC)</td>
+</tr>
+<tr class="row-35 odd">
+	<td class="column-1">GIAC *</td><td class="column-2">GIAC Systems and Network Auditor (GSNA)</td>
+</tr>
+<tr class="row-36 even">
+	<td class="column-1">Logical Operations, Inc. *</td><td class="column-2">CyberSec First Responder (CFR)​</td>
+</tr>
+</tbody>
+</table>
+<!-- #tablepress-iawip-certification_providers from cache -->
+</div></section>
+<section class="av_textblock_section "  itemscope="itemscope" itemtype="https://schema.org/CreativeWork" ><div class='avia_textblock  '   itemprop="text" ><p><strong>The GIAC GSE and GISF were removed from the approved list on 25 January 2013. Individuals holding one of these certifications to qualify for their current IA position will remain qualified. However, a different certification may be required once the GIAC GSE or GISF expires or if the individual changes positions requiring a different certification.</strong></p>
+<p>* This organization is the sole propriety owner of the memberships, site licenses, preassessments, test vouchers, and all other materials related to this certification and their association.</p>
+<p>** CySA+ is a CompTIA certification formerly listed as CSA+. The exam and the official name of the certification remain the same, only the acronym has changed.</p>
+</div></section>
+
+			
+
+			</div>
+
+		</div>
+	</div></div></main><!-- close content main element --> <!-- section close by builder template -->		</div><!--end builder template--></div><!-- close default .container_wrap element -->        </div>
+        <div class='container_wrap footer_color' id='footer'>
+
+          <div class='container'>
+
+            <div class='flex_column av_one_fourth  first el_before_av_one_fourth'><section id="text-2" class="widget clearfix widget_text">			<div class="textwidget"><div class='logo'><a href='https://public.cyber.mil/'><img class='default_logo' height='100' width='300' src='/wp-content/themes/iase/img/DoD-Cyber-Exchange-LogoPUBLIC.png' srcset='/wp-content/themes/iase/img/DoD-Cyber-Exchange-LogoPUBLIC.png 1x, /wp-content/themes/iase/img/DoD-Cyber-Exchange-LogoPUBLIC@2x.png 2x' /><img class='alternate_logo' height='100' width='300' src='/wp-content/themes/iase/img/DoD-Cyber-Exchange-Logo-Footer-PUBLIC.png' srcset='/wp-content/themes/iase/img/DoD-Cyber-Exchange-Logo-Footer-PUBLIC.png 1x, /wp-content/themes/iase/img/DoD-Cyber-Exchange-Logo-Footer-PUBLIC@2x.png 2x' /></a></div>
+<p>The DoD Cyber Exchange is sponsored by<br />
+Defense Information Systems Agency (DISA)</p>
+</div>
+		<span class="seperator extralight-border"></span></section></div><div class='flex_column av_one_fourth  el_after_av_one_fourth  el_before_av_one_fourth '><section id="nav_menu-3" class="widget clearfix widget_nav_menu"><div class="menu-footer-menu-1-container"><ul id="menu-footer-menu-1" class="menu"><li id="menu-item-17675" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17675"><a href="https://public.cyber.mil/cyber-training/">Training</a></li>
+<li id="menu-item-17676" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17676"><a href="https://public.cyber.mil/stigs/">SRGs/STIGs</a></li>
+<li id="menu-item-17677" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17677"><a href="https://public.cyber.mil/pki-pke/">PKI / PKE</a></li>
+<li id="menu-item-17678" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17678"><a href="https://public.cyber.mil/external-resources/">External Resources</a></li>
+</ul></div><span class="seperator extralight-border"></span></section></div><div class='flex_column av_one_fourth  el_after_av_one_fourth  el_before_av_one_fourth '><section id="nav_menu-4" class="widget clearfix widget_nav_menu"><div class="menu-footer-menu-2-container"><ul id="menu-footer-menu-2" class="menu"><li id="menu-item-17679" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17679"><a href="https://public.cyber.mil/privacy-security/">Privacy and Security</a></li>
+<li id="menu-item-17680" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17680"><a href="https://public.cyber.mil/section-508/">Section 508</a></li>
+<li id="menu-item-719" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-719"><a href="https://public.cyber.mil/site-map">Site Map</a></li>
+</ul></div><span class="seperator extralight-border"></span></section></div><div class='flex_column av_one_fourth  el_after_av_one_fourth  el_before_av_one_fourth '><section id="text-4" class="widget clearfix widget_text">			<div class="textwidget"><div class='avia-button-wrap avia-button-center  show_public'><a href='https://cyber.mil/' class='avia-button   avia-icon_select-yes-right-icon avia-color-theme-color avia-size-small avia-position-center '   ><span class='avia_iconbox_title' >Login with CAC</span><span class='avia_button_icon avia_button_icon_right  icon-sprite icon-ue824 icon-font-entypo-fontello icon-size-small' aria-hidden='true' data-av_icon='' data-av_iconfont='entypo-fontello'></span></a></div>
+<p><a href="/email-directo">Help</a></p>
+</div>
+		<span class="seperator extralight-border"></span></section></div>
+
+          </div>
+
+
+        <!-- ####### END FOOTER CONTAINER ####### -->
+        </div>
+
+  
+
+
+      
+
+          <!-- end main -->
+    
+    <!-- end wrap_all --></div>
+
+	<script>var alignTop = "1";</script>
+	<div id="wp-disclaimer-popup" class="wpdp-white-popup mfp-hide">
+<h2 style="text-align: center;">U.S. Government Notice and Consent</h1>
+<p style="text-align: center;">You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.</p>
+<p>By using this IS (which includes any device attached to this IS), you consent to the following conditions:</p>
+<p>&middot; The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.</p>
+<p>&middot; At any time, the USG may inspect and seize data stored on this IS.</p>
+<p>&middot; Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG authorized purpose.</p>
+<p>&middot; This IS includes security measures (e.g., authentication and access controls) to protect USG interests – not for your personal benefit or privacy.</p>
+<p>Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.</p>
+<p class="wpdp-footer">
+	<span id="wpdp-close">OK</span>
+	</p>
+
+
+<script>
+	jQuery('#wpdp-close').click(function($) { 
+		Cookies.set('wp-disclamer-popup', 'allow', { 
+			expires: 1 
+		}); 
+	});
+</script></div>
+ <script type='text/javascript'>
+ /* <![CDATA[ */  
+var avia_framework_globals = avia_framework_globals || {};
+    avia_framework_globals.frameworkUrl = 'https://public.cyber.mil/wp-content/themes/enfold/framework/';
+    avia_framework_globals.installedAt = 'https://public.cyber.mil/wp-content/themes/enfold/';
+    avia_framework_globals.ajaxurl = 'https://public.cyber.mil/wp-admin/admin-ajax.php';
+/* ]]> */ 
+</script>
+ 
+ <script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/enfold/js/shortcodes.js?ver=4.2.6' id='avia-shortcodes-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/contact/contact.js?ver=5.8.4' id='avia-module-contact-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/countdown/countdown.js?ver=5.8.4' id='avia-module-countdown-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/numbers/numbers.js?ver=5.8.4' id='avia-module-numbers-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/portfolio/portfolio.js?ver=5.8.4' id='avia-module-portfolio-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/enfold/config-templatebuilder/avia-shortcodes/notification/notification.js?ver=5.8.4' id='avia-mofdule-notification-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/toolset-blocks/vendor/toolset/toolset-common/res/lib/bootstrap4/js/bootstrap.bundle.js?ver=4.3.1' id='toolset_bootstrap_4-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/disclaimer-popup/public/js/jquery.magnific-popup.min.js?ver=1.1.2' id='magnific-popup-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/disclaimer-popup/public/js/js.cookie.js?ver=1.1.2' id='js-cookie-js'></script>
+<script type='text/javascript' id='post-views-counter-frontend-js-extra'>
+/* <![CDATA[ */
+var pvcArgsFrontend = {"mode":"ajax","requestURL":"https:\/\/public.cyber.mil\/wp-content\/plugins\/post-views-counter\/includes\/ajax.php","postID":"171","nonce":"cb9628bb7c"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/post-views-counter/js/frontend.js?ver=1.3.1' id='post-views-counter-frontend-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/enfold/js/avia.js?ver=4.2.6' id='avia-default-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/enfold/js/aviapopup/jquery.magnific-popup.min.js?ver=4.2.6' id='avia-popup-js'></script>
+<script type='text/javascript' id='mediaelement-core-js-before'>
+var mejsL10n = {"language":"en","strings":{"mejs.download-file":"Download File","mejs.install-flash":"You are using a browser that does not have Flash player enabled or installed. Please turn on your Flash player plugin or download the latest version from https:\/\/get.adobe.com\/flashplayer\/","mejs.fullscreen":"Fullscreen","mejs.play":"Play","mejs.pause":"Pause","mejs.time-slider":"Time Slider","mejs.time-help-text":"Use Left\/Right Arrow keys to advance one second, Up\/Down arrows to advance ten seconds.","mejs.live-broadcast":"Live Broadcast","mejs.volume-help-text":"Use Up\/Down Arrow keys to increase or decrease volume.","mejs.unmute":"Unmute","mejs.mute":"Mute","mejs.volume-slider":"Volume Slider","mejs.video-player":"Video Player","mejs.audio-player":"Audio Player","mejs.captions-subtitles":"Captions\/Subtitles","mejs.captions-chapters":"Chapters","mejs.none":"None","mejs.afrikaans":"Afrikaans","mejs.albanian":"Albanian","mejs.arabic":"Arabic","mejs.belarusian":"Belarusian","mejs.bulgarian":"Bulgarian","mejs.catalan":"Catalan","mejs.chinese":"Chinese","mejs.chinese-simplified":"Chinese (Simplified)","mejs.chinese-traditional":"Chinese (Traditional)","mejs.croatian":"Croatian","mejs.czech":"Czech","mejs.danish":"Danish","mejs.dutch":"Dutch","mejs.english":"English","mejs.estonian":"Estonian","mejs.filipino":"Filipino","mejs.finnish":"Finnish","mejs.french":"French","mejs.galician":"Galician","mejs.german":"German","mejs.greek":"Greek","mejs.haitian-creole":"Haitian Creole","mejs.hebrew":"Hebrew","mejs.hindi":"Hindi","mejs.hungarian":"Hungarian","mejs.icelandic":"Icelandic","mejs.indonesian":"Indonesian","mejs.irish":"Irish","mejs.italian":"Italian","mejs.japanese":"Japanese","mejs.korean":"Korean","mejs.latvian":"Latvian","mejs.lithuanian":"Lithuanian","mejs.macedonian":"Macedonian","mejs.malay":"Malay","mejs.maltese":"Maltese","mejs.norwegian":"Norwegian","mejs.persian":"Persian","mejs.polish":"Polish","mejs.portuguese":"Portuguese","mejs.romanian":"Romanian","mejs.russian":"Russian","mejs.serbian":"Serbian","mejs.slovak":"Slovak","mejs.slovenian":"Slovenian","mejs.spanish":"Spanish","mejs.swahili":"Swahili","mejs.swedish":"Swedish","mejs.tagalog":"Tagalog","mejs.thai":"Thai","mejs.turkish":"Turkish","mejs.ukrainian":"Ukrainian","mejs.vietnamese":"Vietnamese","mejs.welsh":"Welsh","mejs.yiddish":"Yiddish"}};
+</script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-includes/js/mediaelement/mediaelement-and-player.js?ver=4.2.16' id='mediaelement-core-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-includes/js/mediaelement/mediaelement-migrate.js?ver=5.8.4' id='mediaelement-migrate-js'></script>
+<script type='text/javascript' id='mediaelement-js-extra'>
+/* <![CDATA[ */
+var _wpmejsSettings = {"pluginPath":"\/wp-includes\/js\/mediaelement\/","classPrefix":"mejs-","stretching":"responsive"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-includes/js/mediaelement/wp-mediaelement.js?ver=5.8.4' id='wp-mediaelement-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/layouts/resources/js/ddl-tabs-cell-frontend.js?ver=2.6.3.2' id='ddl-tabs-scripts-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-includes/js/underscore.min.js?ver=1.13.1' id='underscore-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/elasticpress/features/facets/assets/js/src/facets.js?ver=2.8.2' id='elasticpress-facets-js'></script>
+<script type='text/javascript' id='ubermenu-js-extra'>
+/* <![CDATA[ */
+var ubermenu_data = {"remove_conflicts":"on","reposition_on_load":"off","intent_delay":"300","intent_interval":"100","intent_threshold":"7","scrollto_offset":"50","scrollto_duration":"1000","responsive_breakpoint":"959","accessible":"on","retractor_display_strategy":"responsive","touch_off_close":"on","collapse_after_scroll":"on","v":"3.3.1.1","configurations":["site_nav","main"],"ajax_url":"https:\/\/public.cyber.mil\/wp-admin\/admin-ajax.php","plugin_url":"https:\/\/public.cyber.mil\/wp-content\/plugins\/ubermenu\/","disable_mobile":"off","prefix_boost":"","aria_role_navigation":"off","aria_expanded":"off","aria_hidden":"off","aria_controls":"","aria_responsive_toggle":"off","theme_locations":{"avia":"IASE Main Menu","avia2":"IASE Secondary Menu <br\/><small>(Will be displayed if you selected a header layout that supports a submenu <a target=\"_blank\" href=\"https:\/\/public.cyber.mil\/wp-admin\/?page=avia#goto_header\">here<\/a>)<\/small>","avia3":"IASE Footer Menu <br\/><small>(no dropdowns)<\/small>"}};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/plugins/ubermenu/assets/js/ubermenu.js?ver=3.3.1.1' id='ubermenu-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-content/themes/iase/js/main.js?ver=3' id='main-js-js'></script>
+<script type='text/javascript' src='https://public.cyber.mil/wp-includes/js/wp-embed.js?ver=5.8.4' id='wp-embed-js'></script>
+<a href='#top' title='Scroll to top' id='scroll-top-link' aria-hidden='true' data-av_icon='' data-av_iconfont='entypo-fontello'><span class="avia_hidden_link_text">Scroll to top</span></a>
+
+<div id="fb-root"></div>
+
+	  <style type="text/css">
+         
+      </style>
+
+<!-- We participate in the US government's analytics program. See the data at analytics.usa.gov -->
+<script async type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=DOD&subagency=CyberExchange" id="_fed_an_ua_tag"></script>
+</body>
+</html>
