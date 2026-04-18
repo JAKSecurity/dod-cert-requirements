@@ -1,0 +1,20 @@
+[project]
+name = "dod-cert-requirements-scripts"
+version = "0.1.0"
+description = "Scripts that produce the DoD cert requirements artifacts."
+requires-python = ">=3.12"
+dependencies = [
+    "openpyxl>=3.1",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
+    "requests>=2.32",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["scripts/tests"]
+
+[tool.setuptools.packages.find]
+include = ["scripts*"]
