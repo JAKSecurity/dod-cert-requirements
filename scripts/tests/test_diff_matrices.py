@@ -48,7 +48,9 @@ def test_new_role_detected():
     a = []
     b = [_rec("999", "certification", "basic", ["X"])]
     d = diff_records(a, b)
-    assert d["added_roles"] == ["999"]
+    assert d["added_roles"] == [
+        {"work_role_code": "999", "work_role_name": "Role 999"}
+    ]
     # New role's cells should NOT be listed in cell_changes
     # (that would double-count; added_roles covers it)
     assert d["cell_changes"] == []
@@ -58,7 +60,9 @@ def test_retired_role_detected():
     a = [_rec("411", "certification", "basic", ["A+"])]
     b = []
     d = diff_records(a, b)
-    assert d["removed_roles"] == ["411"]
+    assert d["removed_roles"] == [
+        {"work_role_code": "411", "work_role_name": "Role 411"}
+    ]
     assert d["cell_changes"] == []
 
 

@@ -25,18 +25,28 @@ def _key(r: dict[str, Any]) -> tuple[str, str, str]:
 def diff_records(old: list[dict[str, Any]], new: list[dict[str, Any]]) -> dict[str, Any]:
     old_idx = {_key(r): r for r in old}
     new_idx = {_key(r): r for r in new}
-    old_roles = {r["work_role_code"] for r in old}
-    new_roles = {r["work_role_code"] for r in new}
+    old_role_names = {r["work_role_code"]: r["work_role_name"] for r in old}
+    new_role_names = {r["work_role_code"]: r["work_role_name"] for r in new}
+    old_roles = set(old_role_names)
+    new_roles = set(new_role_names)
 
-    added_roles = sorted(new_roles - old_roles)
-    removed_roles = sorted(old_roles - new_roles)
+    added_roles = [
+        {"work_role_code": c, "work_role_name": new_role_names[c]}
+        for c in sorted(new_roles - old_roles)
+    ]
+    removed_roles = [
+        {"work_role_code": c, "work_role_name": old_role_names[c]}
+        for c in sorted(old_roles - new_roles)
+    ]
+    added_codes = {r["work_role_code"] for r in added_roles}
+    removed_codes = {r["work_role_code"] for r in removed_roles}
 
     cell_changes = []
     # Only compare cells for roles present in BOTH sides — new roles are
     # already reported in added_roles, retired roles in removed_roles.
     shared_role_keys = {
         k for k in (set(old_idx) & set(new_idx))
-        if k[0] not in added_roles and k[0] not in removed_roles
+        if k[0] not in added_codes and k[0] not in removed_codes
     }
     for key in sorted(shared_role_keys):
         old_certs = set(old_idx[key]["certs"])
