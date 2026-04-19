@@ -22,8 +22,8 @@ VENDOR_SHORT_NAMES = {
     "Logical Operations, Inc. dba CERTNEXUS": "CertNexus",
     "Cisco Systems": "CISCO",
     "CISCO Systems": "CISCO",
-    "Rocheston LLC": "Rocheston",
-    "Rocheston": "Rocheston",
+    "Rocheston LLC": "RCCE",
+    "Rocheston": "RCCE",
     "mile2": "mile2",
     "Mile2": "mile2",
     "United America Technoloiges, LLC": "mile2",  # sic: DoD's typo for 'Technologies' — mile2's legal entity
@@ -34,6 +34,7 @@ VENDOR_SHORT_NAMES = {
 # Mirrors Jan 2025 ordering for shared vendors; new vendors (DAWIA) appended.
 VENDOR_ORDER = [
     "CompTIA",
+    "RCCE",         # moved between CompTIA and EC-Council per Jeff v7 layout
     "EC-Council",
     "FITSI",
     "GIAC (SANS)",
@@ -41,7 +42,6 @@ VENDOR_ORDER = [
     "(ISC)2",
     "CertNexus",
     "CISCO",
-    "Rocheston",
     "mile2",
     "DAWIA",
 ]
@@ -89,7 +89,7 @@ CERT_ORDER_BY_VENDOR = {
     "(ISC)2": ["CC", "SSCP", "CCSP", "CSSLP", "CGRC", "CISSP", "ISSAP", "ISSEP", "ISSMP"],
     "CertNexus": ["CFR", "CSC"],
     "CISCO": ["CCNA", "CBROPS", "CCNP-S", "CCNP-E"],
-    "Rocheston": ["RCCE-1"],  # V2.1: only 'RCCE Level 1' (Jan 2025's CCE is gone in V2.1)
+    "RCCE": ["RCCE-1"],  # V2.1: only 'RCCE Level 1' (Jan 2025's CCE is gone in V2.1)
     "mile2": ["CISSO", "CPTE"],
     "DAWIA": ["DAWIA-LCL-F", "DAWIA-LCL-A", "DAWIA-PM-P", "DAWIA-PM-A"],
 }
@@ -170,7 +170,7 @@ VENDOR_PALETTE = {
     "(ISC)2":      {"base": "FF0F7287", "l1": "FFD3EEF3", "l2": "FF9ED1DB", "l3": "FF4BACC6"},
     "CertNexus":   {"base": "FF996633", "l1": "FFE8DCCA", "l2": "FFC99D66", "l3": "FFA47B4A"},
     "CISCO":       {"base": "FF548235", "l1": "FFE2EFDA", "l2": "FFA9D08E", "l3": "FF70AD47"},
-    "Rocheston":   {"base": "FF8B2635", "l1": "FFF1D6DA", "l2": "FFC66573", "l3": "FF8B2635"},  # burgundy
+    "RCCE":   {"base": "FF8B2635", "l1": "FFF1D6DA", "l2": "FFC66573", "l3": "FF8B2635"},  # burgundy
     "mile2":       {"base": "FF5B2C6F", "l1": "FFE4D3EC", "l2": "FFA285B2", "l3": "FF5B2C6F"},  # purple
     "DAWIA":       {"base": "FF7F6000", "l1": "FFFFF2CC", "l2": "FFE2C879", "l3": "FFBF9000"},
 }
@@ -178,6 +178,14 @@ VENDOR_PALETTE = {
 DEFAULT_PALETTE = {
     "base": "FF595959", "l1": "FFD9D9D9", "l2": "FFA6A6A6", "l3": "FF7F7F7F",
 }
+
+# Per-vendor font size for the row-2 vendor group header. Vendors with
+# short spans (few cert columns) need smaller fonts so the name fits.
+VENDOR_HEADER_FONT_SIZE = {
+    "RCCE": 7,       # only 1 column, needs tiny font
+    "CertNexus": 9,  # 2 columns, slightly smaller than default
+}
+DEFAULT_VENDOR_HEADER_FONT_SIZE = 11
 
 # Hue/saturation range per vendor. Hues in degrees (0-360), saturation 0.0-1.0.
 # The per-cert palette generator walks hue linearly across the vendor's certs.
@@ -193,7 +201,7 @@ VENDOR_HUE_SPEC = {
     "(ISC)2":      {"hue_start": 185, "hue_end": 220,  "sat": 0.55},  # cyan -> blue
     "CertNexus":   {"hue_start":  30, "hue_end":  25,  "sat": 0.45},  # warm brown
     "CISCO":       {"hue_start": 115, "hue_end": 145,  "sat": 0.55},  # green band
-    "Rocheston":   {"hue_start": 350, "hue_end": 355,  "sat": 0.55},  # burgundy
+    "RCCE":   {"hue_start": 350, "hue_end": 355,  "sat": 0.55},  # burgundy
     "mile2":       {"hue_start": 280, "hue_end": 290,  "sat": 0.50},  # purple
     "DAWIA":       {"hue_start":  40, "hue_end":  50,  "sat": 0.85},  # gold range
 }

@@ -26,9 +26,11 @@ from scripts.visual_spec import (
     CERT_SHORT_NAMES,
     CY101_SEPARATOR_BEFORE_CODE,
     DEFAULT_PALETTE,
+    DEFAULT_VENDOR_HEADER_FONT_SIZE,
     ROLE_NAME_OVERRIDES,
     ROLE_ORDER,
     ROLE_ROW_HIGHLIGHTS,
+    VENDOR_HEADER_FONT_SIZE,
     VENDOR_HUE_SPEC,
     VENDOR_ORDER,
     VENDOR_PALETTE,
@@ -443,7 +445,8 @@ def write_pivot_sheet(
         end = col_cursor + span - 1
         pal = _palette_for(v)
         cell = ws.cell(row=2, column=start, value=v)
-        cell.font = white_bold
+        font_size = VENDOR_HEADER_FONT_SIZE.get(v, DEFAULT_VENDOR_HEADER_FONT_SIZE)
+        cell.font = Font(bold=True, color="FFFFFFFF", size=font_size)
         cell.fill = PatternFill("solid", fgColor=pal["base"])
         cell.alignment = CELL_CENTER
         if span > 1:
