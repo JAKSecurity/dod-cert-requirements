@@ -8,6 +8,7 @@ dependencies = [
     "beautifulsoup4>=4.12",
     "lxml>=5.0",
     "requests>=2.32",
+    "pywin32>=306 ; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]
