@@ -160,7 +160,10 @@ VENDOR_PALETTE = {
     "CompTIA":     {"base": "FF595959", "l1": "FFE7E6E6", "l2": "FFBFBFBF", "l3": "FF808080"},
     "EC-Council":  {"base": "FF2E75B6", "l1": "FFDDEBF7", "l2": "FFADC6E3", "l3": "FF5B9BD5"},
     "FITSI":       {"base": "FFC05A00", "l1": "FFFCE4D6", "l2": "FFF4B084", "l3": "FFED7D31"},
-    "GIAC (SANS)": {"base": "FF7030A0", "l1": "FFE4D7F0", "l2": "FFB197D6", "l3": "FF8064A2"},
+    # GIAC covers ~19 certs; Jeff's guidance: just 3 colors total for the
+    # proficiency levels, transitioning pink -> purple with darkness.
+    # Explicit departure from "darker = harder" hue consistency.
+    "GIAC (SANS)": {"base": "FF4B1E6B", "l1": "FFF5C3D2", "l2": "FFD87A9C", "l3": "FF4B1E6B"},
     "ISACA":       {"base": "FFBF8F00", "l1": "FFFFF2CC", "l2": "FFFFD966", "l3": "FFFFC000"},
     "(ISC)2":      {"base": "FF0F7287", "l1": "FFD3EEF3", "l2": "FF9ED1DB", "l3": "FF4BACC6"},
     "CertNexus":   {"base": "FF996633", "l1": "FFE8DCCA", "l2": "FFC99D66", "l3": "FFA47B4A"},
