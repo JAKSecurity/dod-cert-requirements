@@ -17,6 +17,7 @@ from pathlib import Path
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.page import PageMargins
 
 import colorsys
 
@@ -261,6 +262,15 @@ def write_explanation_sheet(wb: Workbook) -> None:
     for line in lines:
         ws.append([line])
     ws.column_dimensions["A"].width = 120
+    # Page setup: portrait Letter, modest margins
+    ws.page_setup.orientation = "portrait"
+    ws.page_setup.paperSize = 1  # Letter 8.5 x 11
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 0  # let it flow if long
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_margins = PageMargins(
+        left=0.5, right=0.5, top=0.5, bottom=0.5, header=0.25, footer=0.25,
+    )
 
 
 def write_summary_sheet(wb: Workbook, role_catalog: dict, per_role: dict) -> None:
@@ -306,6 +316,16 @@ def write_summary_sheet(wb: Workbook, role_catalog: dict, per_role: dict) -> Non
     ).font = Font(italic=True)
 
     ws.freeze_panes = "A3"
+
+    # Page setup: landscape Letter, fit-to-width (may span multiple pages tall)
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.paperSize = 1  # Letter
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 0
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_margins = PageMargins(
+        left=0.4, right=0.4, top=0.4, bottom=0.4, header=0.25, footer=0.25,
+    )
 
 
 def _vendor_short_name(v: str) -> str:
@@ -640,17 +660,18 @@ def write_pivot_sheet(
                  bottom_row=points_row, right_col=echo_col)
 
     # ----- Footnote (pending-review roles) — no blank spacer above -----
+    footnote_row = current_row
     footnote = (
         "Note: The following work roles exist in DoD 8140 V2.1 but have no "
         "published certification options (pending DoD review): "
         + ", ".join(f"({c}) {n}" for c, n in PENDING_REVIEW_ROLES.items())
         + "."
     )
-    fn_cell = ws.cell(row=current_row, column=1, value=footnote)
+    fn_cell = ws.cell(row=footnote_row, column=1, value=footnote)
     fn_cell.font = Font(italic=True, color="FF595959", size=9)
     fn_cell.alignment = Alignment(wrap_text=True, vertical="center")
-    ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=echo_col)
-    ws.row_dimensions[current_row].height = 26
+    ws.merge_cells(start_row=footnote_row, start_column=1, end_row=footnote_row, end_column=echo_col)
+    ws.row_dimensions[footnote_row].height = 26
 
     # ----- Column widths -----
     ws.column_dimensions["A"].width = 47
@@ -669,6 +690,21 @@ def write_pivot_sheet(
 
     # ----- Freeze panes: left of B, below row 3 -----
     ws.freeze_panes = "B4"
+
+    # ----- Page setup for PDF export: Tabloid landscape, tight margins,
+    # fit-to-1-page. Print area includes the matrix + footnote.
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.paperSize = 3  # Tabloid (11 x 17 in)
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 1
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_margins = PageMargins(
+        left=0.25, right=0.25, top=0.25, bottom=0.25,
+        header=0.1, footer=0.1,
+    )
+    ws.print_area = f"A1:{get_column_letter(echo_col)}{footnote_row}"
+    # Center on page horizontally (matrix is wider than tall).
+    ws.print_options.horizontalCentered = True
 
 
 # ----------------------------------------------------------------------------
