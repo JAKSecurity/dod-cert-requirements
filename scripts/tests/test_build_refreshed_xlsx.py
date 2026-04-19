@@ -100,10 +100,12 @@ def test_pivot_sheet_has_certs_as_columns_and_roles_as_rows(tmp_path):
 
     # Find the header row with cert acronyms (should be row 3 per template)
     header_row = [c.value for c in ws[3]]
-    # Work Role column first, then cert columns
+    # Work Role column first, then cert columns, short names per visual_spec
     assert header_row[0] and "Work Role" in str(header_row[0])
     assert "A+" in header_row
-    assert "Security+" in header_row
+    # Security+ gets shortened to "Sec+" per visual_spec.CERT_SHORT_NAMES
+    assert "Sec+" in header_row
+    assert "Net+" in header_row  # Network+ -> Net+
 
     # Find the row for role (411) and check A+ cell = 1
     for row in ws.iter_rows(min_row=4):
@@ -123,4 +125,48 @@ def test_pivot_sheet_has_summary_rows(tmp_path):
     all_labels = [str(r[0].value or "") for r in ws.iter_rows()]
     joined = " | ".join(all_labels)
     assert "Total Positions Covered" in joined
-    assert "Total Points" in joined
+    assert "Points" in joined  # Label is 'Total "Points" ...' (quoted)
+
+
+def test_pivot_sheet_summary_uses_formulas_not_hardcoded(tmp_path):
+    # Skill requirement: summary cells must be Excel formulas, not Python-computed values.
+    out = tmp_path / "out.xlsx"
+    build(FIXTURE, out)
+    wb = load_workbook(out)  # data_only=False so we see formulas
+    ws = wb["Certification Analysis"]
+    # Find the Total Positions row
+    totals_row_num = None
+    for row in ws.iter_rows():
+        if row[0].value and "Total Positions Covered" in str(row[0].value):
+            totals_row_num = row[0].row
+            break
+    assert totals_row_num is not None
+    # Column B should hold a formula like =COUNT(B4:B...)
+    formula_cell = ws.cell(row=totals_row_num, column=2)
+    assert isinstance(formula_cell.value, str)
+    assert formula_cell.value.startswith("=COUNT(")
+
+
+def test_pivot_sheet_has_echo_column_on_right(tmp_path):
+    # Work Role label column duplicated on the right side
+    out = tmp_path / "out.xlsx"
+    build(FIXTURE, out)
+    wb = load_workbook(out, data_only=True)
+    ws = wb["Certification Analysis"]
+    last_col = ws.max_column
+    assert ws.cell(row=3, column=last_col).value == "Work Role"
+    # First data row's echo cell should repeat the left-column label
+    left = ws.cell(row=4, column=1).value
+    right = ws.cell(row=4, column=last_col).value
+    assert left == right
+
+
+def test_pivot_sheet_cert_headers_are_rotated(tmp_path):
+    # Per Jan 2025 styling: cert acronym header cells are rotated 90 degrees.
+    out = tmp_path / "out.xlsx"
+    build(FIXTURE, out)
+    wb = load_workbook(out)
+    ws = wb["Certification Analysis"]
+    # Column B (first cert) in row 3 should be rotated
+    cell = ws.cell(row=3, column=2)
+    assert cell.alignment.text_rotation == 90

@@ -18,6 +18,19 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
+from scripts.visual_spec import (
+    CERT_ORDER_BY_VENDOR,
+    CERT_SHORT_NAMES,
+    CY101_SEPARATOR_BEFORE_CODE,
+    DEFAULT_PALETTE,
+    ROLE_NAME_OVERRIDES,
+    ROLE_ORDER,
+    ROLE_ROW_HIGHLIGHTS,
+    VENDOR_ORDER,
+    VENDOR_PALETTE,
+    VENDOR_SHORT_NAMES,
+)
+
 SHEET_NAME = "Certification Repository"
 HEADER_ROW = 2
 COL_WRC = 0
@@ -208,106 +221,281 @@ def write_summary_sheet(wb: Workbook, role_catalog: dict, per_role: dict) -> Non
     ws.freeze_panes = "A3"
 
 
+def _vendor_short_name(v: str) -> str:
+    return VENDOR_SHORT_NAMES.get(v, v)
+
+
+def _cert_short_name(c: str) -> str:
+    return CERT_SHORT_NAMES.get(c, c)
+
+
+def _build_cert_column_layout(rows: list[dict]) -> list[tuple[str, str]]:
+    """Return ordered list of (short_cert, short_vendor) tuples for pivot columns.
+
+    Layout follows visual_spec.VENDOR_ORDER and CERT_ORDER_BY_VENDOR for known
+    shared certs; V2.1-new certs are appended to their vendor group in
+    appearance order. Unknown vendors (i.e. vendor strings not in
+    VENDOR_SHORT_NAMES) get their own group at the end of the layout.
+    """
+    # Index V2.1 data by short vendor, collecting short cert names in
+    # their V2.1 appearance order for consistency.
+    by_vendor: dict[str, list[str]] = {}
+    seen: set[tuple[str, str]] = set()
+    for r in rows:
+        vs = _vendor_short_name(r["vendor"])
+        cs = _cert_short_name(r["acronym"])
+        if (vs, cs) in seen:
+            continue
+        seen.add((vs, cs))
+        by_vendor.setdefault(vs, []).append(cs)
+
+    layout: list[tuple[str, str]] = []
+    known_vendors: list[str] = list(VENDOR_ORDER)
+    for v in known_vendors:
+        present_certs = set(by_vendor.get(v, []))
+        if not present_certs:
+            continue
+        spec_order = CERT_ORDER_BY_VENDOR.get(v, [])
+        ordered: list[str] = []
+        # First: spec-ordered certs that are actually present in V2.1.
+        for cert in spec_order:
+            if cert in present_certs:
+                ordered.append(cert)
+                present_certs.discard(cert)
+        # Then: any remaining V2.1-present certs not in the spec, appended
+        # in their V2.1 appearance order.
+        for cert in by_vendor[v]:
+            if cert in present_certs:
+                ordered.append(cert)
+                present_certs.discard(cert)
+        for cert in ordered:
+            layout.append((cert, v))
+
+    # Finally: unknown vendors (not in VENDOR_ORDER). Append in appearance order.
+    for v, certs in by_vendor.items():
+        if v in known_vendors:
+            continue
+        for cert in certs:
+            layout.append((cert, v))
+
+    return layout
+
+
+def _build_pivot_cells_short(rows: list[dict]) -> dict[tuple[str, str], int]:
+    """(role_code, short_cert_name) -> highest proficiency level 1/2/3."""
+    cells: dict[tuple[str, str], int] = {}
+    for r in rows:
+        key = (r["wrc"], _cert_short_name(r["acronym"]))
+        level = PROFICIENCY_LEVEL[r["proficiency"]]
+        if key not in cells or cells[key] < level:
+            cells[key] = level
+    return cells
+
+
+def _build_role_row_order(role_catalog: dict) -> list[str | None]:
+    """Produce the ordered list of role rows for the pivot. Pending-review
+    roles are omitted entirely. The sentinel value None marks the position
+    of the CY 101 separator row (inserted between the two role groups).
+    Roles present in role_catalog but not in ROLE_ORDER are appended at the
+    end (safety net for V2.1 additions not yet slotted into the spec).
+    """
+    ordered_roles: list[str | None] = []
+    seen: set[str] = set()
+    for code in ROLE_ORDER:
+        if code in role_catalog:
+            if code == CY101_SEPARATOR_BEFORE_CODE:
+                ordered_roles.append(None)
+            ordered_roles.append(code)
+            seen.add(code)
+    unexpected = sorted(set(role_catalog) - seen - set(PENDING_REVIEW_ROLES))
+    if unexpected:
+        # Silent safety net; listed in refresh-notes if needed.
+        ordered_roles.extend(unexpected)
+    return ordered_roles
+
+
+# Cell alignment / style presets
+CERT_HEADER_ROT = Alignment(horizontal="center", vertical="bottom", text_rotation=90, wrap_text=False)
+CELL_CENTER = Alignment(horizontal="center", vertical="center")
+
+
+def _palette_for(vendor_short: str) -> dict:
+    return VENDOR_PALETTE.get(vendor_short, DEFAULT_PALETTE)
+
+
 def write_pivot_sheet(
     wb: Workbook,
     role_catalog: dict,
-    vendor_cert_map: dict,
-    pivot_cells: dict,
+    rows: list[dict],
 ) -> None:
     ws = wb.create_sheet("Certification Analysis")
 
-    # Ordered vendors (alphabetical for v1; can revisit later)
-    vendors = sorted(vendor_cert_map.keys())
-    # Ordered list of (cert_acronym, vendor) — cert columns in output
-    cert_columns: list[tuple[str, str]] = []
-    for v in vendors:
-        for cert in vendor_cert_map[v]:
-            cert_columns.append((cert, v))
+    cert_columns = _build_cert_column_layout(rows)
+    pivot_cells = _build_pivot_cells_short(rows)
+    role_rows = _build_role_row_order(role_catalog)
 
-    first_cert_col = 2  # column B onwards
+    first_cert_col = 2  # Column B
+    last_cert_col = first_cert_col + len(cert_columns) - 1
+    echo_col = last_cert_col + 1  # right-hand Work Role echo column
 
-    # Row 1: banner
-    ws["A1"] = "DoD 8140 Certification Analysis — Inverted View"
-    ws["A1"].font = Font(bold=True, size=12)
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=first_cert_col + len(cert_columns) - 1)
+    # ----- Row 1: banner -----
+    ws.cell(row=1, column=1, value="DoD 8140.03 Foundational Qualification: Personal Certification").font = Font(
+        bold=True, size=12, color="FFFFFFFF"
+    )
+    ws.cell(row=1, column=1).fill = PatternFill("solid", fgColor="FF1F4E79")
+    ws.cell(row=1, column=1).alignment = CELL_CENTER
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=echo_col)
 
-    # Row 2: vendor group header row (merge across each vendor's cert columns)
+    # ----- Row 2: vendor group headers (merged per vendor) -----
     col_cursor = first_cert_col
-    for v in vendors:
-        span = len(vendor_cert_map[v])
-        cell = ws.cell(row=2, column=col_cursor, value=v)
-        cell.alignment = CENTER
-        cell.font = VENDOR_GROUP_FONT
-        cell.fill = VENDOR_GROUP_FILL
+    vendor_spans: list[tuple[str, int, int]] = []  # (vendor, start_col, end_col)
+    for v in VENDOR_ORDER + sorted(
+        {vend for _, vend in cert_columns if vend not in VENDOR_ORDER}
+    ):
+        certs_for_v = [c for c, vv in cert_columns if vv == v]
+        if not certs_for_v:
+            continue
+        span = len(certs_for_v)
+        start = col_cursor
+        end = col_cursor + span - 1
+        pal = _palette_for(v)
+        cell = ws.cell(row=2, column=start, value=v)
+        cell.font = Font(bold=True, color="FFFFFFFF")
+        cell.fill = PatternFill("solid", fgColor=pal["base"])
+        cell.alignment = CELL_CENTER
         if span > 1:
-            ws.merge_cells(
-                start_row=2, start_column=col_cursor,
-                end_row=2, end_column=col_cursor + span - 1,
-            )
-        col_cursor += span
+            ws.merge_cells(start_row=2, start_column=start, end_row=2, end_column=end)
+        vendor_spans.append((v, start, end))
+        col_cursor = end + 1
 
-    # Row 3: cert-acronym column headers
-    ws.cell(row=3, column=1, value="Work Role").font = HEADER_FONT
-    ws.cell(row=3, column=1).fill = HEADER_FILL
-    ws.cell(row=3, column=1).alignment = CENTER
-    for i, (cert, _vendor) in enumerate(cert_columns):
+    # ----- Row 3: cert acronym headers + Work Role labels -----
+    for c in (1, echo_col):
+        hcell = ws.cell(row=3, column=c, value="Work Role")
+        hcell.font = Font(bold=True, color="FFFFFFFF")
+        hcell.fill = PatternFill("solid", fgColor="FF1F4E79")
+        hcell.alignment = CELL_CENTER
+    for i, (cert, vendor) in enumerate(cert_columns):
+        pal = _palette_for(vendor)
         cell = ws.cell(row=3, column=first_cert_col + i, value=cert)
-        cell.font = HEADER_FONT
-        cell.fill = HEADER_FILL
-        cell.alignment = CENTER
+        cell.font = Font(bold=True, color="FFFFFFFF")
+        cell.fill = PatternFill("solid", fgColor=pal["l3"])
+        cell.alignment = CERT_HEADER_ROT
 
-    # Row 4+: one row per work role
-    role_codes_sorted = sorted(role_catalog.keys(), key=lambda c: int(c))
-    row_num = 4
-    for code in role_codes_sorted:
-        name = role_catalog[code]["name"]
-        ws.cell(row=row_num, column=1, value=f"({code}) {name}").alignment = LEFT_WRAP
-        for i, (cert, _vendor) in enumerate(cert_columns):
+    # ----- Role rows -----
+    level_fill_key = {1: "l1", 2: "l2", 3: "l3"}
+    cy101_link = "https://cyber.mil/training/cyber-101/"
+    cy101_message = (
+        "CY 101 (40-hour online course) satisfies DoD 8140 foundational qualification "
+        "requirements for all Cyber Enabler work roles below (validate with DoD under V2.1)"
+    )
+
+    current_row = 4
+    first_data_row = 4
+    last_data_row = 4
+    for entry in role_rows:
+        if entry is None:
+            # CY 101 separator row
+            c = ws.cell(row=current_row, column=1, value=cy101_message)
+            c.font = Font(bold=True, italic=True, color="FFFFFFFF")
+            c.fill = PatternFill("solid", fgColor="FF203864")
+            c.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            c.hyperlink = cy101_link
+            ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=echo_col)
+            ws.row_dimensions[current_row].height = 22
+            current_row += 1
+            continue
+        code = entry
+        name = ROLE_NAME_OVERRIDES.get(code, role_catalog[code]["name"])
+        role_label = f"({code}) {name}"
+        # Column A (left label)
+        a_cell = ws.cell(row=current_row, column=1, value=role_label)
+        a_cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+        # Echo column (right label)
+        echo_cell = ws.cell(row=current_row, column=echo_col, value=role_label)
+        echo_cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+        # Row-level highlight (e.g. 451 red)
+        highlight = ROLE_ROW_HIGHLIGHTS.get(code)
+        if highlight:
+            fill = PatternFill("solid", fgColor=highlight)
+            a_cell.fill = fill
+            a_cell.font = Font(bold=True, color="FFFFFFFF")
+            echo_cell.fill = fill
+            echo_cell.font = Font(bold=True, color="FFFFFFFF")
+        # Data cells
+        for i, (cert, vendor) in enumerate(cert_columns):
             level = pivot_cells.get((code, cert))
-            if level is not None:
-                ws.cell(row=row_num, column=first_cert_col + i, value=level).alignment = CENTER
-        row_num += 1
+            if level is None:
+                continue
+            pal = _palette_for(vendor)
+            cell = ws.cell(row=current_row, column=first_cert_col + i, value=level)
+            cell.alignment = CELL_CENTER
+            cell.fill = PatternFill("solid", fgColor=pal[level_fill_key[level]])
+            cell.font = Font(bold=True)
+        last_data_row = current_row
+        current_row += 1
 
-    # Summary rows
-    legend_row = row_num + 1
-    ws.cell(row=legend_row, column=1, value="Proficiency: 1 = Basic, 2 = Intermediate, 3 = Advanced").font = Font(italic=True)
+    # ----- Summary rows: legend, totals (formulas), points (formulas) -----
+    current_row += 1  # blank
+    legend_cell = ws.cell(
+        row=current_row, column=1,
+        value="Proficiency levels: Basic = 1, Intermediate = 2, Advanced = 3",
+    )
+    legend_cell.font = Font(italic=True)
+    current_row += 2
 
-    totals_row = legend_row + 2
-    points_row = totals_row + 1
+    totals_row = current_row
     ws.cell(row=totals_row, column=1, value="Total Positions Covered").font = Font(bold=True)
-    ws.cell(row=points_row, column=1, value="Total Points (levels x positions)").font = Font(bold=True)
+    ws.cell(row=totals_row, column=echo_col, value="Total Positions Covered").font = Font(bold=True)
+    current_row += 1
 
-    # Compute totals per cert column
-    for i, (cert, _vendor) in enumerate(cert_columns):
-        # Count how many roles reference this cert (any level)
-        positions = sum(1 for code in role_codes_sorted if (code, cert) in pivot_cells)
-        points = sum(
-            pivot_cells[(code, cert)]
-            for code in role_codes_sorted
-            if (code, cert) in pivot_cells
-        )
-        ws.cell(row=totals_row, column=first_cert_col + i, value=positions).alignment = CENTER
-        ws.cell(row=points_row, column=first_cert_col + i, value=points).alignment = CENTER
+    points_row = current_row
+    ws.cell(row=points_row, column=1, value='Total "Points" (proficiency levels \u00d7 positions)').font = Font(bold=True)
+    ws.cell(row=points_row, column=echo_col, value='Total "Points"').font = Font(bold=True)
+    current_row += 1
 
-    # Footnote
-    footer_row = points_row + 2
-    ws.cell(
-        row=footer_row, column=1,
-        value=(
-            "Note: The following work roles exist in DoD 8140 V2.1 but have no "
-            "published cert options (pending DoD review): "
-            + ", ".join(f"({c}) {n}" for c, n in PENDING_REVIEW_ROLES.items())
-            + "."
-        ),
-    ).font = Font(italic=True)
-
-    # Column widths and freeze panes
-    ws.column_dimensions["A"].width = 45
+    # Excel formulas for summary rows (so end user can audit)
     for i in range(len(cert_columns)):
         col_letter = get_column_letter(first_cert_col + i)
-        ws.column_dimensions[col_letter].width = 8
-    ws.row_dimensions[3].height = 80  # cert acronym headers need height for vertical stacking
-    ws.freeze_panes = ws.cell(row=4, column=2).coordinate
+        data_range = f"{col_letter}{first_data_row}:{col_letter}{last_data_row}"
+        ws.cell(row=totals_row, column=first_cert_col + i, value=f"=COUNT({data_range})").alignment = CELL_CENTER
+        ws.cell(row=points_row, column=first_cert_col + i, value=f"=SUM({data_range})").alignment = CELL_CENTER
+        # Light banding on summary cells using the vendor palette
+        vendor = cert_columns[i][1]
+        pal = _palette_for(vendor)
+        ws.cell(row=totals_row, column=first_cert_col + i).fill = PatternFill("solid", fgColor=pal["l1"])
+        ws.cell(points_row, column=first_cert_col + i).fill = PatternFill("solid", fgColor=pal["l2"])
+
+    # ----- Footnote (pending-review roles) -----
+    current_row += 2
+    footnote = (
+        "Note: The following work roles exist in DoD 8140 V2.1 but have no "
+        "published certification options (pending DoD review): "
+        + ", ".join(f"({c}) {n}" for c, n in PENDING_REVIEW_ROLES.items())
+        + "."
+    )
+    fn_cell = ws.cell(row=current_row, column=1, value=footnote)
+    fn_cell.font = Font(italic=True, color="FF595959")
+    fn_cell.alignment = Alignment(wrap_text=True, vertical="top")
+    ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=echo_col)
+    ws.row_dimensions[current_row].height = 30
+
+    # ----- Column widths -----
+    ws.column_dimensions["A"].width = 47
+    for i in range(len(cert_columns)):
+        letter = get_column_letter(first_cert_col + i)
+        ws.column_dimensions[letter].width = 3.5
+    ws.column_dimensions[get_column_letter(echo_col)].width = 47
+
+    # ----- Row heights -----
+    ws.row_dimensions[1].height = 19
+    ws.row_dimensions[2].height = 19
+    ws.row_dimensions[3].height = 60  # taller for rotated cert acronyms (esp. DAWIA-*)
+    for r in range(4, last_data_row + 1):
+        if r not in ws.row_dimensions or ws.row_dimensions[r].height is None:
+            ws.row_dimensions[r].height = 16
+
+    # ----- Freeze panes: left of B, below row 3 -----
+    ws.freeze_panes = "B4"
 
 
 # ----------------------------------------------------------------------------
@@ -317,15 +505,13 @@ def write_pivot_sheet(
 def build(v21_xlsx_path: str | Path, output_path: str | Path) -> None:
     rows = read_v21_certification_rows(v21_xlsx_path)
     role_catalog = build_role_catalog(rows)
-    vendor_cert_map = build_vendor_cert_map(rows)
-    pivot_cells = build_pivot_cells(rows)
     per_role = build_per_role_by_level(rows)
 
     wb = Workbook()
     wb.remove(wb.active)
     write_explanation_sheet(wb)
     write_summary_sheet(wb, role_catalog, per_role)
-    write_pivot_sheet(wb, role_catalog, vendor_cert_map, pivot_cells)
+    write_pivot_sheet(wb, role_catalog, rows)
     wb.properties.creator = "Jeff Krueger"
     wb.properties.lastModifiedBy = "Jeff Krueger"
     wb.properties.title = "DoD 8140.03 Cert Path Reference"
