@@ -7,7 +7,8 @@ Scope: certification-path qualifications only. Other qualification paths (educat
 ## Summary
 
 - **Work roles added in V2.1:** 11
-- **Work roles removed since Jan 2025:** 3
+- **Work roles removed since Jan 2025:** 0
+- **Work roles with no cert data (pending DoD review):** 3
 - **Cell-level cert changes (shared roles):** 60
 
 ## Work roles added in V2.1
@@ -26,9 +27,9 @@ These work roles are in the current V2.1 Certification Repository but were not t
 - **(461)** Systems Security Analyst
 - **(621)** Software Developer
 
-## Work roles not in V2.1
+## Work roles with no certification data (pending DoD review)
 
-These work roles existed in the Jan 2025 version but do not appear in the V2.1 Certification Repository. They may have been renamed, merged, or moved to a non-certification qualification path.
+These work roles exist in the DoD 8140 V2.1 role universe but have no certification options published in the Certification Repository — the DoD marks them as pending review. They were historically tracked with blank certification cells and are omitted from the refreshed certification matrix. Their cert paths will be added in a future refresh when DoD publishes data.
 
 - **(462)** Control Systems Security Specialist
 - **(731)** Cyber Legal Advisor

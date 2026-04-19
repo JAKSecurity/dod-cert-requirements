@@ -72,6 +72,32 @@ def test_refresh_date_in_output_header():
     assert "2026-04-18" in md
 
 
+def test_known_gap_roles_recategorized_from_removed():
+    md = render(
+        {
+            "added_roles": [],
+            "removed_roles": [
+                {"work_role_code": "462", "work_role_name": "Control Systems"},
+                {"work_role_code": "555", "work_role_name": "Legit Removed Role"},
+            ],
+            "cell_changes": [],
+        },
+        refresh_date="2026-04-18",
+        known_gap_roles=["462"],
+    )
+    # Both roles present, but under different sections
+    assert "pending" in md.lower()
+    assert "462" in md and "Control Systems" in md
+    assert "555" in md and "Legit Removed Role" in md
+    # 462 should appear AFTER the pending-review heading, not removed heading.
+    pending_idx = md.lower().index("pending")
+    removed_idx = md.lower().index("not in v2.1") if "not in v2.1" in md.lower() else -1
+    if removed_idx > 0:
+        # 462 appears after pending heading
+        idx_462 = md.index("462")
+        assert idx_462 > pending_idx
+
+
 def test_summary_counts_are_correct():
     md = render(
         {
