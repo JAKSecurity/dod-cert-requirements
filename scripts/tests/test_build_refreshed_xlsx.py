@@ -148,16 +148,20 @@ def test_pivot_sheet_summary_uses_formulas_not_hardcoded(tmp_path):
 
 
 def test_pivot_sheet_has_echo_column_on_right(tmp_path):
-    # Work Role label column duplicated on the right side
+    # Work Role label column duplicated on the right side of the matrix
+    # (may have a small margin column further right for the heatmap legend).
     out = tmp_path / "out.xlsx"
     build(FIXTURE, out)
     wb = load_workbook(out, data_only=True)
     ws = wb["Certification Analysis"]
-    last_col = ws.max_column
-    assert ws.cell(row=3, column=last_col).value == "Work Role"
-    # First data row's echo cell should repeat the left-column label
-    left = ws.cell(row=4, column=1).value
-    right = ws.cell(row=4, column=last_col).value
+    # Find the right-hand 'Work Role' header cell in row 3
+    header_row = [c.value for c in ws[3]]
+    work_role_cols = [i for i, v in enumerate(header_row, start=1) if v == "Work Role"]
+    assert len(work_role_cols) == 2, f"expected 2 'Work Role' cols, got {work_role_cols}"
+    left_col, right_col = work_role_cols
+    # First data row: left and right cells should carry the same role label
+    left = ws.cell(row=4, column=left_col).value
+    right = ws.cell(row=4, column=right_col).value
     assert left == right
 
 

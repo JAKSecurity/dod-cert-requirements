@@ -139,25 +139,63 @@ ROLE_NAME_OVERRIDES = {
 }
 
 # ----- Color palette per vendor -----
-# Base = shade used for vendor group header row.
-# l1/l2/l3 = lightest/medium/darkest fills for data cells at Basic/Intermediate/Advanced.
-# Within a vendor group all cert columns share the same base; intra-column
-# differentiation comes from proficiency-level shade.
+# Two forms of palette:
+#
+#   VENDOR_PALETTE[v] = {"base": ..., "l1": ..., "l2": ..., "l3": ...}
+#     Used for the vendor group header row (row 2) — one color per vendor.
+#
+#   VENDOR_HUE_SPEC[v] = {"hue_start": H, "hue_end": H, "sat": S, ...}
+#     Drives PER-CERT color generation: as we walk across the N cert columns
+#     for vendor v, we interpolate hue from hue_start to hue_end. Each cert
+#     ends up with its own distinct color; proficiency levels shade that
+#     color lighter (Basic) to darker (Advanced).
+#
+# This matches Jan 2025's aesthetic where GIAC's 14 cert columns walk pink
+# through purple through dark red, CompTIA walks light gray through dark gray
+# with a pink accent for CySA+, etc. Colors are hue-interpolated, not
+# hand-picked (Jeff: "colors are not important; shading and differentiation
+# by vendor is").
+
 VENDOR_PALETTE = {
-    "CompTIA":     {"base": "FF6D6D6D", "l1": "FFE0E0E0", "l2": "FFB0B0B0", "l3": "FF808080"},  # gray
-    "EC-Council":  {"base": "FF2E75B6", "l1": "FFDDEBF7", "l2": "FFADC6E3", "l3": "FF5B9BD5"},  # blue
-    "FITSI":       {"base": "FFC05A00", "l1": "FFFCE4D6", "l2": "FFF4B084", "l3": "FFED7D31"},  # orange
-    "GIAC (SANS)": {"base": "FF7030A0", "l1": "FFE4D7F0", "l2": "FFB197D6", "l3": "FF8064A2"},  # purple
-    "ISACA":       {"base": "FFBF8F00", "l1": "FFFFF2CC", "l2": "FFFFD966", "l3": "FFFFC000"},  # amber
-    "(ISC)2":      {"base": "FF0F7287", "l1": "FFD3EEF3", "l2": "FF9ED1DB", "l3": "FF4BACC6"},  # teal
-    "CertNexus":   {"base": "FF996633", "l1": "FFE8DCCA", "l2": "FFC99D66", "l3": "FFA47B4A"},  # brown
-    "CISCO":       {"base": "FF548235", "l1": "FFE2EFDA", "l2": "FFA9D08E", "l3": "FF70AD47"},  # green
-    "Rocheston":   {"base": "FF6F6000", "l1": "FFECE4BD", "l2": "FFC8B56B", "l3": "FF938953"},  # olive
-    "mile2":       {"base": "FF1F4E3C", "l1": "FFCCE5DC", "l2": "FF7AB89A", "l3": "FF2E7D5B"},  # forest green
-    "DAWIA":       {"base": "FF7F6000", "l1": "FFFFF2CC", "l2": "FFE2C879", "l3": "FFBF9000"},  # dark gold
+    "CompTIA":     {"base": "FF595959", "l1": "FFE7E6E6", "l2": "FFBFBFBF", "l3": "FF808080"},
+    "EC-Council":  {"base": "FF2E75B6", "l1": "FFDDEBF7", "l2": "FFADC6E3", "l3": "FF5B9BD5"},
+    "FITSI":       {"base": "FFC05A00", "l1": "FFFCE4D6", "l2": "FFF4B084", "l3": "FFED7D31"},
+    "GIAC (SANS)": {"base": "FF7030A0", "l1": "FFE4D7F0", "l2": "FFB197D6", "l3": "FF8064A2"},
+    "ISACA":       {"base": "FFBF8F00", "l1": "FFFFF2CC", "l2": "FFFFD966", "l3": "FFFFC000"},
+    "(ISC)2":      {"base": "FF0F7287", "l1": "FFD3EEF3", "l2": "FF9ED1DB", "l3": "FF4BACC6"},
+    "CertNexus":   {"base": "FF996633", "l1": "FFE8DCCA", "l2": "FFC99D66", "l3": "FFA47B4A"},
+    "CISCO":       {"base": "FF548235", "l1": "FFE2EFDA", "l2": "FFA9D08E", "l3": "FF70AD47"},
+    "Rocheston":   {"base": "FF6F6000", "l1": "FFECE4BD", "l2": "FFC8B56B", "l3": "FF938953"},
+    "mile2":       {"base": "FF1F4E3C", "l1": "FFCCE5DC", "l2": "FF7AB89A", "l3": "FF2E7D5B"},
+    "DAWIA":       {"base": "FF7F6000", "l1": "FFFFF2CC", "l2": "FFE2C879", "l3": "FFBF9000"},
 }
 
-# Used for any vendor not in VENDOR_PALETTE (defensive fallback).
 DEFAULT_PALETTE = {
     "base": "FF595959", "l1": "FFD9D9D9", "l2": "FFA6A6A6", "l3": "FF7F7F7F",
+}
+
+# Hue/saturation range per vendor. Hues in degrees (0-360), saturation 0.0-1.0.
+# The per-cert palette generator walks hue linearly across the vendor's certs.
+# `sat`=0 gives a monochrome (grayscale) family, used for CompTIA.
+VENDOR_HUE_SPEC = {
+    # CompTIA: grays walking from light to dark, but CySA+ and CASP+ break out
+    # with pink/black accents. Handled via explicit per-cert overrides below.
+    "CompTIA":     {"hue_start":   0, "hue_end":   0,  "sat": 0.00},
+    "EC-Council":  {"hue_start": 205, "hue_end": 240,  "sat": 0.55},  # blue to indigo
+    "FITSI":       {"hue_start":  25, "hue_end":  35,  "sat": 0.70},  # orange tight band
+    "GIAC (SANS)": {"hue_start": 320, "hue_end": 260,  "sat": 0.70},  # pink -> purple (wrap backwards)
+    "ISACA":       {"hue_start":  40, "hue_end":  35,  "sat": 0.85},  # amber
+    "(ISC)2":      {"hue_start": 185, "hue_end": 220,  "sat": 0.55},  # cyan -> blue
+    "CertNexus":   {"hue_start":  30, "hue_end":  25,  "sat": 0.45},  # warm brown
+    "CISCO":       {"hue_start": 115, "hue_end": 145,  "sat": 0.55},  # green band
+    "Rocheston":   {"hue_start":  55, "hue_end":  55,  "sat": 0.55},  # olive (single cert)
+    "mile2":       {"hue_start": 150, "hue_end": 160,  "sat": 0.65},  # forest green
+    "DAWIA":       {"hue_start":  40, "hue_end":  50,  "sat": 0.85},  # gold range
+}
+
+# Per-cert overrides. Takes precedence over the vendor hue walk.
+# Format: {cert_short_name: (hue, sat)}. Lightness is still level-dependent.
+CERT_COLOR_OVERRIDES: dict[str, tuple[float, float]] = {
+    "CySA+":  (330, 0.70),  # Jan 2025's pink accent
+    "CASP+":  (0,   0.00),  # black
 }

@@ -18,7 +18,10 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
+import colorsys
+
 from scripts.visual_spec import (
+    CERT_COLOR_OVERRIDES,
     CERT_ORDER_BY_VENDOR,
     CERT_SHORT_NAMES,
     CY101_SEPARATOR_BEFORE_CODE,
@@ -26,10 +29,66 @@ from scripts.visual_spec import (
     ROLE_NAME_OVERRIDES,
     ROLE_ORDER,
     ROLE_ROW_HIGHLIGHTS,
+    VENDOR_HUE_SPEC,
     VENDOR_ORDER,
     VENDOR_PALETTE,
     VENDOR_SHORT_NAMES,
 )
+
+
+# Lightness values for proficiency levels. Lower = darker.
+LEVEL_LIGHTNESS = {1: 0.82, 2: 0.64, 3: 0.42}
+HEADER_CELL_LIGHTNESS = 0.30  # cert acronym header — darker than Advanced
+
+
+def _hsl_to_argb(hue_deg: float, sat: float, lightness: float) -> str:
+    """Convert HSL (hue in degrees, sat+lightness 0-1) to Excel ARGB string."""
+    h = (hue_deg % 360) / 360.0
+    r, g, b = colorsys.hls_to_rgb(h, lightness, sat)
+    return f"FF{int(r * 255):02X}{int(g * 255):02X}{int(b * 255):02X}"
+
+
+def _cert_color_spec(short_cert: str, vendor_short: str,
+                     cert_index: int, total_certs: int) -> tuple[float, float]:
+    """Return (hue_deg, saturation) for a cert column. Overrides win."""
+    if short_cert in CERT_COLOR_OVERRIDES:
+        return CERT_COLOR_OVERRIDES[short_cert]
+    spec = VENDOR_HUE_SPEC.get(vendor_short)
+    if spec is None:
+        return 0.0, 0.0
+    if total_certs <= 1:
+        t = 0.0
+    else:
+        t = cert_index / (total_certs - 1)
+    hue = spec["hue_start"] + t * (spec["hue_end"] - spec["hue_start"])
+    return hue, spec["sat"]
+
+
+def _cert_cell_fill(short_cert: str, vendor_short: str, cert_index: int,
+                    total_certs: int, level: int) -> str:
+    hue, sat = _cert_color_spec(short_cert, vendor_short, cert_index, total_certs)
+    # For grayscale (sat=0) we use a lightness scale; for color we also use lightness.
+    return _hsl_to_argb(hue, sat, LEVEL_LIGHTNESS[level])
+
+
+def _cert_header_fill(short_cert: str, vendor_short: str, cert_index: int,
+                      total_certs: int) -> str:
+    hue, sat = _cert_color_spec(short_cert, vendor_short, cert_index, total_certs)
+    return _hsl_to_argb(hue, sat, HEADER_CELL_LIGHTNESS)
+
+
+def _heatmap_fill(value: int, max_value: int, kind: str) -> str | None:
+    """Return fill color for a heat-map cell. kind=positions or points."""
+    if value <= 0 or max_value <= 0:
+        return None
+    t = value / max_value
+    # Two palettes: positions (green-red scale) and points (similar).
+    # Both use lightness driven by t.
+    if kind == "positions":
+        # light pink -> dark red scale, per Jan 2025 convention
+        return _hsl_to_argb(hue_deg=0, sat=0.55, lightness=0.90 - 0.55 * t)
+    # points
+    return _hsl_to_argb(hue_deg=130, sat=0.45, lightness=0.90 - 0.55 * t)
 
 SHEET_NAME = "Certification Repository"
 HEADER_ROW = 2
@@ -323,6 +382,19 @@ def _palette_for(vendor_short: str) -> dict:
     return VENDOR_PALETTE.get(vendor_short, DEFAULT_PALETTE)
 
 
+def _cert_index_within_vendor(cert_columns: list[tuple[str, str]]) -> dict[int, tuple[int, int]]:
+    """Map global column index -> (index-within-vendor, total-certs-for-vendor)."""
+    by_vendor_positions: dict[str, list[int]] = {}
+    for idx, (_, vendor) in enumerate(cert_columns):
+        by_vendor_positions.setdefault(vendor, []).append(idx)
+    mapping: dict[int, tuple[int, int]] = {}
+    for vendor, positions in by_vendor_positions.items():
+        total = len(positions)
+        for within_idx, global_idx in enumerate(positions):
+            mapping[global_idx] = (within_idx, total)
+    return mapping
+
+
 def write_pivot_sheet(
     wb: Workbook,
     role_catalog: dict,
@@ -333,25 +405,31 @@ def write_pivot_sheet(
     cert_columns = _build_cert_column_layout(rows)
     pivot_cells = _build_pivot_cells_short(rows)
     role_rows = _build_role_row_order(role_catalog)
+    cert_pos = _cert_index_within_vendor(cert_columns)
 
     first_cert_col = 2  # Column B
     last_cert_col = first_cert_col + len(cert_columns) - 1
     echo_col = last_cert_col + 1  # right-hand Work Role echo column
+    margin_col = echo_col + 1      # "darker shades = more coverage" note column
+
+    banner_fill = PatternFill("solid", fgColor="FF1F4E79")
+    white_bold = Font(bold=True, color="FFFFFFFF")
+    white_bold_small = Font(bold=True, color="FFFFFFFF", size=10)
 
     # ----- Row 1: banner -----
     ws.cell(row=1, column=1, value="DoD 8140.03 Foundational Qualification: Personal Certification").font = Font(
         bold=True, size=12, color="FFFFFFFF"
     )
-    ws.cell(row=1, column=1).fill = PatternFill("solid", fgColor="FF1F4E79")
+    ws.cell(row=1, column=1).fill = banner_fill
     ws.cell(row=1, column=1).alignment = CELL_CENTER
     ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=echo_col)
 
     # ----- Row 2: vendor group headers (merged per vendor) -----
     col_cursor = first_cert_col
-    vendor_spans: list[tuple[str, int, int]] = []  # (vendor, start_col, end_col)
-    for v in VENDOR_ORDER + sorted(
+    vendor_iter = list(VENDOR_ORDER) + sorted(
         {vend for _, vend in cert_columns if vend not in VENDOR_ORDER}
-    ):
+    )
+    for v in vendor_iter:
         certs_for_v = [c for c, vv in cert_columns if vv == v]
         if not certs_for_v:
             continue
@@ -360,38 +438,39 @@ def write_pivot_sheet(
         end = col_cursor + span - 1
         pal = _palette_for(v)
         cell = ws.cell(row=2, column=start, value=v)
-        cell.font = Font(bold=True, color="FFFFFFFF")
+        cell.font = white_bold
         cell.fill = PatternFill("solid", fgColor=pal["base"])
         cell.alignment = CELL_CENTER
         if span > 1:
             ws.merge_cells(start_row=2, start_column=start, end_row=2, end_column=end)
-        vendor_spans.append((v, start, end))
         col_cursor = end + 1
 
-    # ----- Row 3: cert acronym headers + Work Role labels -----
+    # ----- Row 3: cert acronym headers (each cert its own color) -----
     for c in (1, echo_col):
         hcell = ws.cell(row=3, column=c, value="Work Role")
-        hcell.font = Font(bold=True, color="FFFFFFFF")
-        hcell.fill = PatternFill("solid", fgColor="FF1F4E79")
+        hcell.font = white_bold
+        hcell.fill = banner_fill
         hcell.alignment = CELL_CENTER
     for i, (cert, vendor) in enumerate(cert_columns):
-        pal = _palette_for(vendor)
+        within_idx, total = cert_pos[i]
+        header_fill = _cert_header_fill(cert, vendor, within_idx, total)
         cell = ws.cell(row=3, column=first_cert_col + i, value=cert)
-        cell.font = Font(bold=True, color="FFFFFFFF")
-        cell.fill = PatternFill("solid", fgColor=pal["l3"])
+        cell.font = white_bold_small
+        cell.fill = PatternFill("solid", fgColor=header_fill)
         cell.alignment = CERT_HEADER_ROT
 
     # ----- Role rows -----
-    level_fill_key = {1: "l1", 2: "l2", 3: "l3"}
     cy101_link = "https://cyber.mil/training/cyber-101/"
     cy101_message = (
         "CY 101 (40-hour online course) satisfies DoD 8140 foundational qualification "
         "requirements for all Cyber Enabler work roles below (validate with DoD under V2.1)"
     )
+    band_fill = PatternFill("solid", fgColor="FFF2F2F2")  # very light gray banding
 
     current_row = 4
     first_data_row = 4
     last_data_row = 4
+    data_row_count = 0
     for entry in role_rows:
         if entry is None:
             # CY 101 separator row
@@ -407,13 +486,14 @@ def write_pivot_sheet(
         code = entry
         name = ROLE_NAME_OVERRIDES.get(code, role_catalog[code]["name"])
         role_label = f"({code}) {name}"
-        # Column A (left label)
+        band = (data_row_count % 2 == 1)
+        data_row_count += 1
+        # Column A (left label) and echo column (right label)
         a_cell = ws.cell(row=current_row, column=1, value=role_label)
         a_cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
-        # Echo column (right label)
         echo_cell = ws.cell(row=current_row, column=echo_col, value=role_label)
         echo_cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
-        # Row-level highlight (e.g. 451 red)
+        # Row-level highlight (e.g. 451 red) overrides banding
         highlight = ROLE_ROW_HIGHLIGHTS.get(code)
         if highlight:
             fill = PatternFill("solid", fgColor=highlight)
@@ -421,28 +501,55 @@ def write_pivot_sheet(
             a_cell.font = Font(bold=True, color="FFFFFFFF")
             echo_cell.fill = fill
             echo_cell.font = Font(bold=True, color="FFFFFFFF")
+        elif band:
+            a_cell.fill = band_fill
+            echo_cell.fill = band_fill
         # Data cells
         for i, (cert, vendor) in enumerate(cert_columns):
             level = pivot_cells.get((code, cert))
             if level is None:
+                if band:
+                    blank = ws.cell(row=current_row, column=first_cert_col + i)
+                    blank.fill = band_fill
                 continue
-            pal = _palette_for(vendor)
+            within_idx, total = cert_pos[i]
+            fill_hex = _cert_cell_fill(cert, vendor, within_idx, total, level)
             cell = ws.cell(row=current_row, column=first_cert_col + i, value=level)
             cell.alignment = CELL_CENTER
-            cell.fill = PatternFill("solid", fgColor=pal[level_fill_key[level]])
-            cell.font = Font(bold=True)
+            cell.fill = PatternFill("solid", fgColor=fill_hex)
+            # Text color: light on dark cells, dark on light cells
+            text_color = "FFFFFFFF" if level == 3 else "FF000000"
+            cell.font = Font(bold=True, color=text_color)
         last_data_row = current_row
         current_row += 1
 
-    # ----- Summary rows: legend, totals (formulas), points (formulas) -----
+    # ----- Proficiency legend row -----
     current_row += 1  # blank
     legend_cell = ws.cell(
         row=current_row, column=1,
         value="Proficiency levels: Basic = 1, Intermediate = 2, Advanced = 3",
     )
     legend_cell.font = Font(italic=True)
-    current_row += 2
+    current_row += 1
 
+    # ----- Repeated cert header row (above heatmap) -----
+    repeat_header_row = current_row
+    for c in (1, echo_col):
+        rh = ws.cell(row=repeat_header_row, column=c, value="Work Role")
+        rh.font = white_bold
+        rh.fill = banner_fill
+        rh.alignment = CELL_CENTER
+    for i, (cert, vendor) in enumerate(cert_columns):
+        within_idx, total = cert_pos[i]
+        header_fill = _cert_header_fill(cert, vendor, within_idx, total)
+        cell = ws.cell(row=repeat_header_row, column=first_cert_col + i, value=cert)
+        cell.font = white_bold_small
+        cell.fill = PatternFill("solid", fgColor=header_fill)
+        cell.alignment = CERT_HEADER_ROT
+    ws.row_dimensions[repeat_header_row].height = 60
+    current_row += 1
+
+    # ----- Summary rows (formulas + heatmap fills) -----
     totals_row = current_row
     ws.cell(row=totals_row, column=1, value="Total Positions Covered").font = Font(bold=True)
     ws.cell(row=totals_row, column=echo_col, value="Total Positions Covered").font = Font(bold=True)
@@ -453,17 +560,50 @@ def write_pivot_sheet(
     ws.cell(row=points_row, column=echo_col, value='Total "Points"').font = Font(bold=True)
     current_row += 1
 
-    # Excel formulas for summary rows (so end user can audit)
+    # Pre-compute max values per row for heat-map scaling
+    positions_values: list[int] = []
+    points_values: list[int] = []
+    for i, (cert, _vendor) in enumerate(cert_columns):
+        positions_values.append(
+            sum(1 for code in role_catalog if (code, cert) in pivot_cells)
+        )
+        points_values.append(
+            sum(pivot_cells[(code, cert)] for code in role_catalog if (code, cert) in pivot_cells)
+        )
+    max_positions = max(positions_values) if positions_values else 0
+    max_points = max(points_values) if points_values else 0
+
     for i in range(len(cert_columns)):
         col_letter = get_column_letter(first_cert_col + i)
         data_range = f"{col_letter}{first_data_row}:{col_letter}{last_data_row}"
-        ws.cell(row=totals_row, column=first_cert_col + i, value=f"=COUNT({data_range})").alignment = CELL_CENTER
-        ws.cell(row=points_row, column=first_cert_col + i, value=f"=SUM({data_range})").alignment = CELL_CENTER
-        # Light banding on summary cells using the vendor palette
-        vendor = cert_columns[i][1]
-        pal = _palette_for(vendor)
-        ws.cell(row=totals_row, column=first_cert_col + i).fill = PatternFill("solid", fgColor=pal["l1"])
-        ws.cell(points_row, column=first_cert_col + i).fill = PatternFill("solid", fgColor=pal["l2"])
+        # Formulas (auditable)
+        tcell = ws.cell(row=totals_row, column=first_cert_col + i, value=f"=COUNT({data_range})")
+        pcell = ws.cell(row=points_row, column=first_cert_col + i, value=f"=SUM({data_range})")
+        tcell.alignment = CELL_CENTER
+        pcell.alignment = CELL_CENTER
+        # Heatmap fills driven by pre-computed values
+        pos_fill = _heatmap_fill(positions_values[i], max_positions, "positions")
+        pts_fill = _heatmap_fill(points_values[i], max_points, "points")
+        if pos_fill:
+            tcell.fill = PatternFill("solid", fgColor=pos_fill)
+        if pts_fill:
+            pcell.fill = PatternFill("solid", fgColor=pts_fill)
+        # Bold text on the high-coverage cells
+        high_threshold_pos = 0.7 * max_positions if max_positions else 0
+        high_threshold_pts = 0.7 * max_points if max_points else 0
+        if positions_values[i] >= high_threshold_pos and positions_values[i] > 0:
+            tcell.font = Font(bold=True)
+        if points_values[i] >= high_threshold_pts and points_values[i] > 0:
+            pcell.font = Font(bold=True)
+
+    # Margin note: "darker shades cover more work roles"
+    margin_cell = ws.cell(
+        row=totals_row, column=margin_col,
+        value="darker shades cover more work roles"
+    )
+    margin_cell.font = Font(italic=True, size=9)
+    margin_cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+    ws.merge_cells(start_row=totals_row, start_column=margin_col, end_row=points_row, end_column=margin_col)
 
     # ----- Footnote (pending-review roles) -----
     current_row += 2
@@ -485,11 +625,12 @@ def write_pivot_sheet(
         letter = get_column_letter(first_cert_col + i)
         ws.column_dimensions[letter].width = 3.5
     ws.column_dimensions[get_column_letter(echo_col)].width = 47
+    ws.column_dimensions[get_column_letter(margin_col)].width = 22
 
     # ----- Row heights -----
     ws.row_dimensions[1].height = 19
     ws.row_dimensions[2].height = 19
-    ws.row_dimensions[3].height = 60  # taller for rotated cert acronyms (esp. DAWIA-*)
+    ws.row_dimensions[3].height = 60  # rotated cert acronyms
     for r in range(4, last_data_row + 1):
         if r not in ws.row_dimensions or ws.row_dimensions[r].height is None:
             ws.row_dimensions[r].height = 16
