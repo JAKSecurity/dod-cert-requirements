@@ -15,7 +15,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from openpyxl import Workbook, load_workbook
-from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 import colorsys
@@ -386,6 +386,42 @@ CERT_HEADER_ROT = Alignment(horizontal="center", vertical="bottom", text_rotatio
 CELL_CENTER = Alignment(horizontal="center", vertical="center")
 
 
+def _outline_box(ws, top_row: int, left_col: int,
+                 bottom_row: int, right_col: int) -> None:
+    """Draw a thin outer border around a rectangular range, preserving any
+    existing borders on interior cells."""
+    thin = Side(style="thin", color="FF000000")
+    # Top edge
+    for c in range(left_col, right_col + 1):
+        cell = ws.cell(row=top_row, column=c)
+        b = cell.border
+        cell.border = Border(
+            top=thin,
+            left=thin if c == left_col else b.left,
+            right=thin if c == right_col else b.right,
+            bottom=b.bottom,
+        )
+    # Bottom edge
+    for c in range(left_col, right_col + 1):
+        cell = ws.cell(row=bottom_row, column=c)
+        b = cell.border
+        cell.border = Border(
+            bottom=thin,
+            left=thin if c == left_col else b.left,
+            right=thin if c == right_col else b.right,
+            top=b.top,
+        )
+    # Left and right edges (excluding corners already handled above)
+    for r in range(top_row + 1, bottom_row):
+        left = ws.cell(row=r, column=left_col)
+        b = left.border
+        left.border = Border(left=thin, top=b.top, right=b.right, bottom=b.bottom)
+        if right_col != left_col:
+            right = ws.cell(row=r, column=right_col)
+            b = right.border
+            right.border = Border(right=thin, top=b.top, left=b.left, bottom=b.bottom)
+
+
 def _palette_for(vendor_short: str) -> dict:
     return VENDOR_PALETTE.get(vendor_short, DEFAULT_PALETTE)
 
@@ -436,6 +472,7 @@ def write_pivot_sheet(
     vendor_iter = list(VENDOR_ORDER) + sorted(
         {vend for _, vend in cert_columns if vend not in VENDOR_ORDER}
     )
+    vendor_spans: list[tuple[int, int]] = []
     for v in vendor_iter:
         certs_for_v = [c for c, vv in cert_columns if vv == v]
         if not certs_for_v:
@@ -451,6 +488,7 @@ def write_pivot_sheet(
         cell.alignment = CELL_CENTER
         if span > 1:
             ws.merge_cells(start_row=2, start_column=start, end_row=2, end_column=end)
+        vendor_spans.append((start, end))
         col_cursor = end + 1
 
     # ----- Row 3: cert acronym headers (each cert its own color) -----
@@ -537,6 +575,11 @@ def write_pivot_sheet(
         cell.alignment = CERT_HEADER_ROT
     ws.row_dimensions[repeat_header_row].height = 40
     current_row += 1
+
+    # ----- Thin outer box around each vendor's column group (row 2 -> repeat header) -----
+    for start_col, end_col in vendor_spans:
+        _outline_box(ws, top_row=2, left_col=start_col,
+                     bottom_row=repeat_header_row, right_col=end_col)
 
     # ----- Summary rows (formulas + heatmap fills) -----
     totals_row = current_row
