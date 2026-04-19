@@ -65,29 +65,42 @@ def _cert_color_spec(short_cert: str, vendor_short: str,
     return hue, spec["sat"]
 
 
-def _cert_cell_fill(vendor_short: str, level: int) -> str:
-    """Data-cell fill: three fixed colors per vendor (from VENDOR_PALETTE
-    l1/l2/l3), regardless of which cert in the vendor group. Keeps the
-    proficiency shading easy to read and the palette compact. Matches
-    Jeff's GIAC request (~3 colors, not a per-cert hue walk)."""
-    pal = VENDOR_PALETTE.get(vendor_short, DEFAULT_PALETTE)
-    key = {1: "l1", 2: "l2", 3: "l3"}[level]
-    return pal[key]
+def _cert_column_color(short_cert: str, vendor_short: str,
+                        cert_index: int, total_certs: int) -> tuple[str, str]:
+    """Return (cell_fill_argb, text_color_argb) for a cert column.
+
+    One color per cert column, applied to both the cert acronym header and
+    every data cell in that column. Level (1/2/3) is communicated by the
+    cell VALUE, not the fill. Within a vendor group the lightness walks
+    wider (easier=lighter, harder=darker) so adjacent cert columns are
+    visually distinguishable even inside single-hue vendors like CompTIA.
+
+    Text color auto-picks white on dark fills, black on light fills."""
+    hue, sat = _cert_color_spec(short_cert, vendor_short, cert_index, total_certs)
+    if total_certs <= 1:
+        lightness = 0.50
+    else:
+        t = cert_index / (total_certs - 1)
+        lightness = 0.78 - t * 0.58  # 0.78 -> 0.20
+    fill = _hsl_to_argb(hue, sat, lightness)
+    text = "FFFFFFFF" if lightness < 0.55 else "FF000000"
+    return fill, text
 
 
 def _cert_header_fill(short_cert: str, vendor_short: str, cert_index: int,
-                      total_certs: int) -> str:
-    """Cert-acronym header fill: per-cert lightness gradient within the
-    vendor's hue. Easiest cert (leftmost) = lighter; hardest cert (rightmost)
-    = darker. Creates visible variation on the cert-name row even within
-    single-hue vendors like CompTIA (grayscale)."""
+                      total_certs: int) -> tuple[str, str]:
+    """Header variant of the cert column color — same hue, but always
+    toward the darker end of the walk so the header stands out above the
+    (lighter) cells."""
     hue, sat = _cert_color_spec(short_cert, vendor_short, cert_index, total_certs)
     if total_certs <= 1:
         lightness = 0.28
     else:
         t = cert_index / (total_certs - 1)
-        lightness = 0.42 - t * 0.28  # walks 0.42 -> 0.14
-    return _hsl_to_argb(hue, sat, lightness)
+        lightness = 0.42 - t * 0.28  # 0.42 -> 0.14
+    fill = _hsl_to_argb(hue, sat, lightness)
+    text = "FFFFFFFF" if lightness < 0.55 else "FF000000"
+    return fill, text
 
 
 def _heatmap_fill(value: int, max_value: int, kind: str) -> str | None:
@@ -445,9 +458,9 @@ def write_pivot_sheet(
         hcell.alignment = CELL_CENTER
     for i, (cert, vendor) in enumerate(cert_columns):
         within_idx, total = cert_pos[i]
-        header_fill = _cert_header_fill(cert, vendor, within_idx, total)
+        header_fill, header_text = _cert_header_fill(cert, vendor, within_idx, total)
         cell = ws.cell(row=3, column=first_cert_col + i, value=cert)
-        cell.font = white_bold_small
+        cell.font = Font(bold=True, color=header_text, size=10)
         cell.fill = PatternFill("solid", fgColor=header_fill)
         cell.alignment = CERT_HEADER_ROT
 
@@ -483,10 +496,11 @@ def write_pivot_sheet(
                 if band:
                     ws.cell(row=current_row, column=first_cert_col + i).fill = band_fill
                 continue
+            within_idx, total = cert_pos[i]
+            cell_fill, text_color = _cert_column_color(cert, vendor, within_idx, total)
             cell = ws.cell(row=current_row, column=first_cert_col + i, value=level)
             cell.alignment = CELL_CENTER
-            cell.fill = PatternFill("solid", fgColor=_cert_cell_fill(vendor, level))
-            text_color = "FFFFFFFF" if level == 3 else "FF000000"
+            cell.fill = PatternFill("solid", fgColor=cell_fill)
             cell.font = Font(bold=True, color=text_color)
         last_data_row = current_row
         current_row += 1
@@ -513,12 +527,12 @@ def write_pivot_sheet(
 
     for i, (cert, vendor) in enumerate(cert_columns):
         within_idx, total = cert_pos[i]
-        header_fill = _cert_header_fill(cert, vendor, within_idx, total)
+        header_fill, header_text = _cert_header_fill(cert, vendor, within_idx, total)
         cell = ws.cell(row=repeat_header_row, column=first_cert_col + i, value=cert)
-        cell.font = white_bold_small
+        cell.font = Font(bold=True, color=header_text, size=10)
         cell.fill = PatternFill("solid", fgColor=header_fill)
         cell.alignment = CERT_HEADER_ROT
-    ws.row_dimensions[repeat_header_row].height = 54
+    ws.row_dimensions[repeat_header_row].height = 40
     current_row += 1
 
     # ----- Summary rows (formulas + heatmap fills) -----
@@ -597,7 +611,7 @@ def write_pivot_sheet(
     # ----- Row heights — squished ~10% from v4 baseline -----
     ws.row_dimensions[1].height = 17
     ws.row_dimensions[2].height = 17
-    ws.row_dimensions[3].height = 54  # rotated cert acronyms (was 60)
+    ws.row_dimensions[3].height = 40  # rotated cert acronyms (DAWIA prefix gone)
     for r in range(4, last_data_row + 1):
         if r not in ws.row_dimensions or ws.row_dimensions[r].height is None:
             ws.row_dimensions[r].height = 14

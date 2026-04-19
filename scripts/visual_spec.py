@@ -61,10 +61,12 @@ CERT_SHORT_NAMES = {
     "CISSP-ISSAP": "ISSAP",
     "CISSP-ISSEP": "ISSEP",
     "CISSP-ISSMP": "ISSMP",
-    "DAWIA LCL Foundational": "DAWIA-LCL-F",
-    "DAWIA LCL Advanced": "DAWIA-LCL-A",
-    "DAWIA PM Practioner": "DAWIA-PM-P",  # sic: DoD typo for 'Practitioner'
-    "DAWIA PM Advanced": "DAWIA-PM-A",
+    # The vendor group header already says DAWIA; drop the prefix on each
+    # cert so the rotated headers need less row height.
+    "DAWIA LCL Foundational": "LCL-F",
+    "DAWIA LCL Advanced": "LCL-A",
+    "DAWIA PM Practioner": "PM-P",  # sic: DoD typo for 'Practitioner'
+    "DAWIA PM Advanced": "PM-A",
     "RCCE Level 1": "RCCE-1",
 }
 
