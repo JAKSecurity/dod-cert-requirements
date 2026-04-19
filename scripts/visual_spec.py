@@ -53,8 +53,10 @@ CERT_SHORT_NAMES = {
     "Network+": "Net+",
     "Security+": "Sec+",
     "PenTest+": "PenTest",
-    "SecurityX/CASP+": "CASP+",
-    "SecurityX / CASP+": "CASP+",
+    # CompTIA renamed CASP+ to SecurityX; treating as the same cert with the
+    # new name. "SecX" keeps the column header tight.
+    "SecurityX/CASP+": "SecX",
+    "SecurityX / CASP+": "SecX",
     "CCNP Security": "CCNP-S",
     "CCNP Enterprise": "CCNP-E",
     "CGRC/CAP": "CGRC",
@@ -76,7 +78,7 @@ CERT_SHORT_NAMES = {
 # the cert goes into whichever vendor group V2.1's source data assigns it to
 # (appended to the end of that group).
 CERT_ORDER_BY_VENDOR = {
-    "CompTIA": ["A+", "Net+", "Sec+", "Cloud+", "PenTest", "CySA+", "CASP+"],
+    "CompTIA": ["A+", "Net+", "Sec+", "Cloud+", "PenTest", "CySA+", "SecX"],
     "EC-Council": ["CND", "CEH", "CEH(P)", "CHFI", "ECIH", "CCISO"],
     "FITSI": ["FITSP-O", "FITSP-D", "FITSP-A", "FITSP-M"],
     "GIAC (SANS)": [

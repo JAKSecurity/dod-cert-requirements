@@ -633,8 +633,13 @@ def write_pivot_sheet(
     ws.row_dimensions[totals_row].height = 14
     ws.row_dimensions[points_row].height = 14
 
-    # ----- Footnote (pending-review roles) — tight spacing -----
-    current_row += 1  # single blank
+    # ----- Outer box around the whole structured matrix (A1 through
+    # last cert-value row in the echo column). Drawn BEFORE the footnote
+    # so the footnote remains outside the frame.
+    _outline_box(ws, top_row=1, left_col=1,
+                 bottom_row=points_row, right_col=echo_col)
+
+    # ----- Footnote (pending-review roles) — no blank spacer above -----
     footnote = (
         "Note: The following work roles exist in DoD 8140 V2.1 but have no "
         "published certification options (pending DoD review): "
