@@ -165,8 +165,8 @@ VENDOR_PALETTE = {
     "(ISC)2":      {"base": "FF0F7287", "l1": "FFD3EEF3", "l2": "FF9ED1DB", "l3": "FF4BACC6"},
     "CertNexus":   {"base": "FF996633", "l1": "FFE8DCCA", "l2": "FFC99D66", "l3": "FFA47B4A"},
     "CISCO":       {"base": "FF548235", "l1": "FFE2EFDA", "l2": "FFA9D08E", "l3": "FF70AD47"},
-    "Rocheston":   {"base": "FF6F6000", "l1": "FFECE4BD", "l2": "FFC8B56B", "l3": "FF938953"},
-    "mile2":       {"base": "FF1F4E3C", "l1": "FFCCE5DC", "l2": "FF7AB89A", "l3": "FF2E7D5B"},
+    "Rocheston":   {"base": "FF8B2635", "l1": "FFF1D6DA", "l2": "FFC66573", "l3": "FF8B2635"},  # burgundy
+    "mile2":       {"base": "FF5B2C6F", "l1": "FFE4D3EC", "l2": "FFA285B2", "l3": "FF5B2C6F"},  # purple
     "DAWIA":       {"base": "FF7F6000", "l1": "FFFFF2CC", "l2": "FFE2C879", "l3": "FFBF9000"},
 }
 
@@ -188,14 +188,12 @@ VENDOR_HUE_SPEC = {
     "(ISC)2":      {"hue_start": 185, "hue_end": 220,  "sat": 0.55},  # cyan -> blue
     "CertNexus":   {"hue_start":  30, "hue_end":  25,  "sat": 0.45},  # warm brown
     "CISCO":       {"hue_start": 115, "hue_end": 145,  "sat": 0.55},  # green band
-    "Rocheston":   {"hue_start":  55, "hue_end":  55,  "sat": 0.55},  # olive (single cert)
-    "mile2":       {"hue_start": 150, "hue_end": 160,  "sat": 0.65},  # forest green
+    "Rocheston":   {"hue_start": 350, "hue_end": 355,  "sat": 0.55},  # burgundy
+    "mile2":       {"hue_start": 280, "hue_end": 290,  "sat": 0.50},  # purple
     "DAWIA":       {"hue_start":  40, "hue_end":  50,  "sat": 0.85},  # gold range
 }
 
 # Per-cert overrides. Takes precedence over the vendor hue walk.
 # Format: {cert_short_name: (hue, sat)}. Lightness is still level-dependent.
-CERT_COLOR_OVERRIDES: dict[str, tuple[float, float]] = {
-    "CySA+":  (330, 0.70),  # Jan 2025's pink accent
-    "CASP+":  (0,   0.00),  # black
-}
+# (Empty — no special-case colors at present.)
+CERT_COLOR_OVERRIDES: dict[str, tuple[float, float]] = {}

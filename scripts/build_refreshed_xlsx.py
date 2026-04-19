@@ -37,8 +37,9 @@ from scripts.visual_spec import (
 
 
 # Lightness values for proficiency levels. Lower = darker.
-LEVEL_LIGHTNESS = {1: 0.82, 2: 0.64, 3: 0.42}
-HEADER_CELL_LIGHTNESS = 0.30  # cert acronym header — darker than Advanced
+# Deliberate wide spread so Basic vs Advanced reads at a glance.
+LEVEL_LIGHTNESS = {1: 0.88, 2: 0.60, 3: 0.25}
+HEADER_CELL_LIGHTNESS = 0.18  # cert acronym header — darker than Advanced
 
 
 def _hsl_to_argb(hue_deg: float, sat: float, lightness: float) -> str:
@@ -291,50 +292,41 @@ def _cert_short_name(c: str) -> str:
 def _build_cert_column_layout(rows: list[dict]) -> list[tuple[str, str]]:
     """Return ordered list of (short_cert, short_vendor) tuples for pivot columns.
 
-    Layout follows visual_spec.VENDOR_ORDER and CERT_ORDER_BY_VENDOR for known
-    shared certs; V2.1-new certs are appended to their vendor group in
-    appearance order. Unknown vendors (i.e. vendor strings not in
-    VENDOR_SHORT_NAMES) get their own group at the end of the layout.
+    Within each vendor group, certs are sorted by **average proficiency level
+    across all roles that require them**, ascending. This puts entry-level
+    certs (mostly Basic, avg near 1) before advanced certs (mostly Advanced,
+    avg near 3) — loosely in order of difficulty. Ties broken by cert name.
     """
-    # Index V2.1 data by short vendor, collecting short cert names in
-    # their V2.1 appearance order for consistency.
-    by_vendor: dict[str, list[str]] = {}
-    seen: set[tuple[str, str]] = set()
+    # Index V2.1 data by short vendor, collecting cert acronym and proficiency.
+    by_vendor: dict[str, set[str]] = {}
+    cert_levels: dict[str, list[int]] = {}
     for r in rows:
         vs = _vendor_short_name(r["vendor"])
         cs = _cert_short_name(r["acronym"])
-        if (vs, cs) in seen:
+        level = PROFICIENCY_LEVEL.get(r["proficiency"])
+        if level is None:
             continue
-        seen.add((vs, cs))
-        by_vendor.setdefault(vs, []).append(cs)
+        by_vendor.setdefault(vs, set()).add(cs)
+        cert_levels.setdefault(cs, []).append(level)
+
+    def avg_level(cert: str) -> float:
+        levels = cert_levels.get(cert, [])
+        return sum(levels) / len(levels) if levels else 0.0
 
     layout: list[tuple[str, str]] = []
     known_vendors: list[str] = list(VENDOR_ORDER)
     for v in known_vendors:
-        present_certs = set(by_vendor.get(v, []))
-        if not present_certs:
+        certs = by_vendor.get(v)
+        if not certs:
             continue
-        spec_order = CERT_ORDER_BY_VENDOR.get(v, [])
-        ordered: list[str] = []
-        # First: spec-ordered certs that are actually present in V2.1.
-        for cert in spec_order:
-            if cert in present_certs:
-                ordered.append(cert)
-                present_certs.discard(cert)
-        # Then: any remaining V2.1-present certs not in the spec, appended
-        # in their V2.1 appearance order.
-        for cert in by_vendor[v]:
-            if cert in present_certs:
-                ordered.append(cert)
-                present_certs.discard(cert)
+        ordered = sorted(certs, key=lambda c: (avg_level(c), c.lower()))
         for cert in ordered:
             layout.append((cert, v))
 
-    # Finally: unknown vendors (not in VENDOR_ORDER). Append in appearance order.
-    for v, certs in by_vendor.items():
-        if v in known_vendors:
-            continue
-        for cert in certs:
+    # Unknown vendors (not in VENDOR_ORDER), appended at end; same sort rule.
+    for v in sorted(set(by_vendor) - set(known_vendors)):
+        ordered = sorted(by_vendor[v], key=lambda c: (avg_level(c), c.lower()))
+        for cert in ordered:
             layout.append((cert, v))
 
     return layout
@@ -351,26 +343,35 @@ def _build_pivot_cells_short(rows: list[dict]) -> dict[tuple[str, str], int]:
     return cells
 
 
+CYBER_ENABLER_ELEMENT = "Cyberspace Enablers"
+
+
 def _build_role_row_order(role_catalog: dict) -> list[str | None]:
-    """Produce the ordered list of role rows for the pivot. Pending-review
-    roles are omitted entirely. The sentinel value None marks the position
-    of the CY 101 separator row (inserted between the two role groups).
-    Roles present in role_catalog but not in ROLE_ORDER are appended at the
-    end (safety net for V2.1 additions not yet slotted into the spec).
+    """Produce the ordered list of role rows for the pivot.
+
+    Roles are sorted by WRC numerically ascending. The CY 101 separator
+    (sentinel: None) is inserted before the first role whose element is
+    'Cyberspace Enablers' (V2.1 element terminology) — respecting the CY 101
+    note's intended applicability.
+
+    Pending-review roles (per PENDING_REVIEW_ROLES) are omitted.
     """
-    ordered_roles: list[str | None] = []
-    seen: set[str] = set()
-    for code in ROLE_ORDER:
-        if code in role_catalog:
-            if code == CY101_SEPARATOR_BEFORE_CODE:
-                ordered_roles.append(None)
-            ordered_roles.append(code)
-            seen.add(code)
-    unexpected = sorted(set(role_catalog) - seen - set(PENDING_REVIEW_ROLES))
-    if unexpected:
-        # Silent safety net; listed in refresh-notes if needed.
-        ordered_roles.extend(unexpected)
-    return ordered_roles
+    excluded = set(PENDING_REVIEW_ROLES)
+    sorted_codes = sorted(
+        (c for c in role_catalog if c not in excluded),
+        key=lambda c: int(c),
+    )
+    ordered: list[str | None] = []
+    separator_placed = False
+    for code in sorted_codes:
+        if (
+            not separator_placed
+            and role_catalog[code].get("element") == CYBER_ENABLER_ELEMENT
+        ):
+            ordered.append(None)
+            separator_placed = True
+        ordered.append(code)
+    return ordered
 
 
 # Cell alignment / style presets
@@ -477,7 +478,7 @@ def write_pivot_sheet(
             c = ws.cell(row=current_row, column=1, value=cy101_message)
             c.font = Font(bold=True, italic=True, color="FFFFFFFF")
             c.fill = PatternFill("solid", fgColor="FF203864")
-            c.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            c.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
             c.hyperlink = cy101_link
             ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=echo_col)
             ws.row_dimensions[current_row].height = 22
@@ -523,22 +524,22 @@ def write_pivot_sheet(
         last_data_row = current_row
         current_row += 1
 
-    # ----- Proficiency legend row -----
-    current_row += 1  # blank
-    legend_cell = ws.cell(
-        row=current_row, column=1,
-        value="Proficiency levels: Basic = 1, Intermediate = 2, Advanced = 3",
-    )
-    legend_cell.font = Font(italic=True)
-    current_row += 1
-
-    # ----- Repeated cert header row (above heatmap) -----
+    # ----- Combined legend + repeated cert header row (saves 2 rows) -----
+    # Column A carries the proficiency legend; cert columns repeat the cert
+    # acronym headers (rotated 90 deg, same styling as row 3); echo column
+    # carries the "Work Role" label.
+    current_row += 1  # single spacer
     repeat_header_row = current_row
-    for c in (1, echo_col):
-        rh = ws.cell(row=repeat_header_row, column=c, value="Work Role")
-        rh.font = white_bold
-        rh.fill = banner_fill
-        rh.alignment = CELL_CENTER
+    legend_cell = ws.cell(
+        row=repeat_header_row, column=1,
+        value="Proficiency levels:\nBasic = 1, Intermediate = 2, Advanced = 3",
+    )
+    legend_cell.font = Font(italic=True, size=9)
+    legend_cell.alignment = Alignment(horizontal="left", vertical="bottom", wrap_text=True)
+    echo_header = ws.cell(row=repeat_header_row, column=echo_col, value="Work Role")
+    echo_header.font = white_bold
+    echo_header.fill = banner_fill
+    echo_header.alignment = CELL_CENTER
     for i, (cert, vendor) in enumerate(cert_columns):
         within_idx, total = cert_pos[i]
         header_fill = _cert_header_fill(cert, vendor, within_idx, total)
@@ -596,14 +597,13 @@ def write_pivot_sheet(
         if points_values[i] >= high_threshold_pts and points_values[i] > 0:
             pcell.font = Font(bold=True)
 
-    # Margin note: "darker shades cover more work roles"
+    # Margin note: "darker shades cover more work roles" — inline on totals row
     margin_cell = ws.cell(
         row=totals_row, column=margin_col,
         value="darker shades cover more work roles"
     )
     margin_cell.font = Font(italic=True, size=9)
     margin_cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
-    ws.merge_cells(start_row=totals_row, start_column=margin_col, end_row=points_row, end_column=margin_col)
 
     # ----- Footnote (pending-review roles) -----
     current_row += 2
