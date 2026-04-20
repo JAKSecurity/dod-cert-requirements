@@ -9,9 +9,14 @@ The Python builder is the authoritative spec. This document summarizes design de
 
 ## Sheets
 
-1. **Explanation** — placeholder narrative + compiled-by line. Jeff rewrites when ready to publish.
-2. **Certification Requirements** — per-role summary: one row per work role, columns show cert lists at Basic / Intermediate / Advanced. Plain text view.
-3. **Certification Analysis** — the pivot crown jewel. Details below.
+**One consolidated sheet: `Certification Analysis`.** Matrix occupies the top;
+explanation block sits directly below the pending-review footnote on the same
+sheet so the PDF export renders as a single 11x17 landscape page.
+
+Earlier iterations had separate `Explanation` and `Certification Requirements`
+sheets — both removed after Jeff's v1.1 consolidation direction:
+- `Explanation` content embedded below the matrix (see EXPLANATION_LINES in the builder).
+- `Certification Requirements` (per-role list view) dropped entirely — the pivot view already encodes the same data more compactly.
 
 ## Certification Analysis layout
 

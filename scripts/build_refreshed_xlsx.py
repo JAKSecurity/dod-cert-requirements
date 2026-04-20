@@ -199,19 +199,6 @@ def build_pivot_cells(rows: list[dict]) -> dict[tuple[str, str], int]:
     return cells
 
 
-def build_per_role_by_level(rows: list[dict]) -> dict[str, dict[str, list[str]]]:
-    """role_code -> {basic: [certs], intermediate: [certs], advanced: [certs]}"""
-    result: dict[str, dict[str, set]] = defaultdict(
-        lambda: {"basic": set(), "intermediate": set(), "advanced": set()}
-    )
-    for r in rows:
-        result[r["wrc"]][r["proficiency"]].add(r["acronym"])
-    return {
-        code: {level: sorted(certs) for level, certs in by_level.items()}
-        for code, by_level in result.items()
-    }
-
-
 # ----------------------------------------------------------------------------
 # Sheet writers
 # ----------------------------------------------------------------------------
@@ -224,108 +211,18 @@ CENTER = Alignment(horizontal="center", vertical="center", wrap_text=True)
 LEFT_WRAP = Alignment(horizontal="left", vertical="center", wrap_text=True)
 
 
-def write_explanation_sheet(wb: Workbook) -> None:
-    ws = wb.create_sheet("Explanation")
-    lines = [
-        "DoD 8140 Cybersecurity Workforce Qualification — Personal Certification Path",
-        "",
-        "[PLACEHOLDER — narrative to be rewritten by Jeff]",
-        "",
-        "This workbook presents the certification-path options from DoDM 8140.03, "
-        "sourced from the DoD 8140 Foundational Qualification Matrix V2.1 "
-        "(effective 2025-09-19). Other qualification paths in the DoD 8140 "
-        "paradigm (education, DoD training, commercial training, experience) "
-        "are intentionally out of scope for this reference.",
-        "",
-        "Tabs:",
-        "  - 'Certification Requirements' — per-role summary: for each work role, "
-        "the approved certification options at Basic / Intermediate / Advanced levels.",
-        "  - 'Certification Analysis' — inverted pivot view: all certs across all "
-        "work roles on one page. Cells contain the highest proficiency level "
-        "(1 = Basic, 2 = Intermediate, 3 = Advanced) at which that cert "
-        "qualifies a person for that role. Summary rows at the bottom.",
-        "",
-        "Work roles with no certification data (pending DoD review):",
-    ]
-    for code, name in PENDING_REVIEW_ROLES.items():
-        lines.append(f"  - ({code}) {name}")
-    lines.append("")
-    lines.append(
-        "These roles exist in the DoD 8140 V2.1 role universe but have no published "
-        "certification options. Omitted from the matrix; will be added when DoD publishes data."
-    )
-    lines.append("")
-    lines.append("Authoritative source: DoD 8140 Foundational Qualification Matrix V2.1")
-    lines.append("URL at time of refresh: www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices")
-    lines.append("")
-    lines.append("Compiled by Jeff Krueger.")
-    for line in lines:
-        ws.append([line])
-    ws.column_dimensions["A"].width = 120
-    # Page setup: portrait Letter, modest margins
-    ws.page_setup.orientation = "portrait"
-    ws.page_setup.paperSize = 1  # Letter 8.5 x 11
-    ws.page_setup.fitToWidth = 1
-    ws.page_setup.fitToHeight = 0  # let it flow if long
-    ws.sheet_properties.pageSetUpPr.fitToPage = True
-    ws.page_margins = PageMargins(
-        left=0.5, right=0.5, top=0.5, bottom=0.5, header=0.25, footer=0.25,
-    )
-
-
-def write_summary_sheet(wb: Workbook, role_catalog: dict, per_role: dict) -> None:
-    ws = wb.create_sheet("Certification Requirements")
-
-    # Row 1: banner
-    ws["A1"] = "Certification Path Qualification Options (DoD 8140.03)"
-    ws["A1"].font = Font(bold=True, size=12)
-
-    # Row 2: headers
-    headers = ["Work Role", "Basic", "Intermediate", "Advanced"]
-    for col_idx, h in enumerate(headers, start=1):
-        cell = ws.cell(row=2, column=col_idx, value=h)
-        cell.font = HEADER_FONT
-        cell.fill = HEADER_FILL
-        cell.alignment = CENTER
-
-    # Data rows sorted by WRC numerically
-    row_num = 3
-    for code in sorted(role_catalog.keys(), key=lambda c: int(c)):
-        name = role_catalog[code]["name"]
-        ws.cell(row=row_num, column=1, value=f"({code}) {name}").alignment = LEFT_WRAP
-        levels = per_role.get(code, {"basic": [], "intermediate": [], "advanced": []})
-        ws.cell(row=row_num, column=2, value=", ".join(levels["basic"]) or None).alignment = LEFT_WRAP
-        ws.cell(row=row_num, column=3, value=", ".join(levels["intermediate"]) or None).alignment = LEFT_WRAP
-        ws.cell(row=row_num, column=4, value=", ".join(levels["advanced"]) or None).alignment = LEFT_WRAP
-        row_num += 1
-
-    # Column widths
-    ws.column_dimensions["A"].width = 50
-    for col in ("B", "C", "D"):
-        ws.column_dimensions[col].width = 40
-
-    # Footnote
-    ws.cell(
-        row=row_num + 1, column=1,
-        value=(
-            "Note: The following work roles exist in DoD 8140 V2.1 but have no "
-            "published cert options (pending DoD review): "
-            + ", ".join(f"({c}) {n}" for c, n in PENDING_REVIEW_ROLES.items())
-            + "."
-        ),
-    ).font = Font(italic=True)
-
-    ws.freeze_panes = "A3"
-
-    # Page setup: landscape Letter, fit-to-width (may span multiple pages tall)
-    ws.page_setup.orientation = "landscape"
-    ws.page_setup.paperSize = 1  # Letter
-    ws.page_setup.fitToWidth = 1
-    ws.page_setup.fitToHeight = 0
-    ws.sheet_properties.pageSetUpPr.fitToPage = True
-    ws.page_margins = PageMargins(
-        left=0.4, right=0.4, top=0.4, bottom=0.4, header=0.25, footer=0.25,
-    )
+# Explanation block that lives below the matrix (same sheet, same printed page).
+# Kept compact so the full 11x17 landscape page can hold matrix + this block.
+# Jeff rewrites the PLACEHOLDER when ready to publish.
+EXPLANATION_LINES: list[str] = [
+    "",  # spacer
+    "DoD 8140 Cybersecurity Workforce Qualification — Personal Certification Path",
+    "[PLACEHOLDER — narrative to be rewritten by Jeff.]",
+    "Scope: certification-path qualifications only. Other paths (education, DoD training, commercial training, experience alternatives) are out of scope for this reference.",
+    "Source: DoD 8140 Foundational Qualification Matrix V2.1 (effective 2025-09-19), via www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices.",
+    "Note: CompTIA renamed CASP+ to SecurityX in 2024; both names refer to the same certification. This matrix shows it as \"SecX\".",
+    "Compiled by Jeff Krueger.",
+]
 
 
 def _vendor_short_name(v: str) -> str:
@@ -673,6 +570,29 @@ def write_pivot_sheet(
     ws.merge_cells(start_row=footnote_row, start_column=1, end_row=footnote_row, end_column=echo_col)
     ws.row_dimensions[footnote_row].height = 26
 
+    # ----- Explanation block (below footnote, same printed page) -----
+    explain_start_row = footnote_row + 1
+    for i, line in enumerate(EXPLANATION_LINES):
+        r = explain_start_row + i
+        cell = ws.cell(row=r, column=1, value=line if line else None)
+        if not line:
+            ws.row_dimensions[r].height = 6  # thin spacer
+            continue
+        # First explanation line (after spacer) is the title — bolder, slightly larger
+        is_title = (i == 1)
+        cell.font = Font(
+            bold=is_title,
+            italic=not is_title,
+            size=10 if is_title else 9,
+            color="FF000000" if is_title else "FF333333",
+        )
+        cell.alignment = Alignment(
+            horizontal="left", vertical="top", wrap_text=True,
+        )
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=echo_col)
+        ws.row_dimensions[r].height = 14 if is_title else 12
+    explain_end_row = explain_start_row + len(EXPLANATION_LINES) - 1
+
     # ----- Column widths -----
     ws.column_dimensions["A"].width = 47
     for i in range(len(cert_columns)):
@@ -702,7 +622,7 @@ def write_pivot_sheet(
         left=0.25, right=0.25, top=0.25, bottom=0.25,
         header=0.1, footer=0.1,
     )
-    ws.print_area = f"A1:{get_column_letter(echo_col)}{footnote_row}"
+    ws.print_area = f"A1:{get_column_letter(echo_col)}{explain_end_row}"
     # Center on page horizontally (matrix is wider than tall).
     ws.print_options.horizontalCentered = True
 
@@ -714,12 +634,10 @@ def write_pivot_sheet(
 def build(v21_xlsx_path: str | Path, output_path: str | Path) -> None:
     rows = read_v21_certification_rows(v21_xlsx_path)
     role_catalog = build_role_catalog(rows)
-    per_role = build_per_role_by_level(rows)
 
     wb = Workbook()
     wb.remove(wb.active)
-    write_explanation_sheet(wb)
-    write_summary_sheet(wb, role_catalog, per_role)
+    # Single consolidated sheet: matrix + explanation below it = 1-page PDF.
     write_pivot_sheet(wb, role_catalog, rows)
     wb.properties.creator = "Jeff Krueger"
     wb.properties.lastModifiedBy = "Jeff Krueger"

@@ -65,31 +65,36 @@ def test_pivot_cells_uses_highest_level_when_cert_appears_at_multiple_levels():
     assert cells[("111", "Security+")] == 3  # advanced wins
 
 
-def test_build_produces_three_sheets(tmp_path):
+def test_build_produces_single_consolidated_sheet(tmp_path):
+    # Jeff's v1.1 direction: collapse to one sheet (matrix + explanation
+    # below it), so the PDF is a single page.
     out = tmp_path / "out.xlsx"
     build(FIXTURE, out)
     wb = load_workbook(out, read_only=True)
-    assert wb.sheetnames == [
-        "Explanation",
-        "Certification Requirements",
-        "Certification Analysis",
-    ]
+    assert wb.sheetnames == ["Certification Analysis"]
 
 
-def test_summary_sheet_has_one_row_per_role(tmp_path):
+def test_explanation_block_lives_below_matrix_footnote(tmp_path):
     out = tmp_path / "out.xlsx"
     build(FIXTURE, out)
     wb = load_workbook(out, data_only=True)
-    ws = wb["Certification Requirements"]
-    # Header rows + 3 data rows for 3 fixture roles
-    role_codes = []
-    for row in ws.iter_rows(min_row=3, values_only=True):
-        if row[0]:
-            role_codes.append(str(row[0]))
-    # Role cell formatted as "(CODE) Name" per template convention
-    assert any("411" in r for r in role_codes)
-    assert any("211" in r for r in role_codes)
-    assert any("111" in r for r in role_codes)
+    ws = wb["Certification Analysis"]
+    # Scan all rows for the explanation title
+    titles = []
+    for r in range(1, ws.max_row + 1):
+        v = ws.cell(row=r, column=1).value
+        if v and "Personal Certification Path" in str(v):
+            titles.append(r)
+    assert len(titles) == 1, f"expected one explanation title row, got {titles}"
+    # The title row must sit below the pending-review footnote
+    footnote_row = None
+    for r in range(1, ws.max_row + 1):
+        v = ws.cell(row=r, column=1).value
+        if v and "pending DoD review" in str(v):
+            footnote_row = r
+            break
+    assert footnote_row is not None
+    assert titles[0] > footnote_row
 
 
 def test_pivot_sheet_has_certs_as_columns_and_roles_as_rows(tmp_path):
