@@ -664,7 +664,7 @@ def write_pivot_sheet(
         r = explain_start_row + i
         cell = ws.cell(row=r, column=1, value=line if line else None)
         if not line:
-            ws.row_dimensions[r].height = 6  # thin spacer
+            ws.row_dimensions[r].height = 12  # thin spacer (2x prior)
             continue
         # First non-empty line of the narrative is styled as the title.
         is_title = not first_nonempty_seen
@@ -672,14 +672,14 @@ def write_pivot_sheet(
         cell.font = Font(
             bold=is_title,
             italic=not is_title,
-            size=10 if is_title else 9,
+            size=20 if is_title else 18,  # ~2x the earlier 10/9 sizing
             color="FF000000" if is_title else "FF333333",
         )
         cell.alignment = Alignment(
             horizontal="left", vertical="top", wrap_text=True,
         )
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=echo_col)
-        ws.row_dimensions[r].height = 14 if is_title else 12
+        ws.row_dimensions[r].height = 28 if is_title else 24
     explain_end_row = explain_start_row + len(explanation_lines) - 1
 
     # ----- Column widths -----
