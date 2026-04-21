@@ -660,26 +660,37 @@ def write_pivot_sheet(
     )
     explain_start_row = footnote_row + 1
     first_nonempty_seen = False
+    # Approx chars per visual line when narrative is merged across A:BJ,
+    # rendered at 12pt. Used to estimate how many wrapped lines each row
+    # needs and set its height accordingly so no text gets clipped.
+    chars_per_line = 230
+    body_size = 12
+    title_size = 14
+    line_height_pt = 1.35  # multiplier on font size -> row points
     for i, line in enumerate(explanation_lines):
         r = explain_start_row + i
         cell = ws.cell(row=r, column=1, value=line if line else None)
         if not line:
-            ws.row_dimensions[r].height = 12  # thin spacer (2x prior)
+            ws.row_dimensions[r].height = 8  # thin spacer
             continue
         # First non-empty line of the narrative is styled as the title.
         is_title = not first_nonempty_seen
         first_nonempty_seen = True
+        font_size = title_size if is_title else body_size
         cell.font = Font(
             bold=is_title,
             italic=not is_title,
-            size=20 if is_title else 18,  # ~2x the earlier 10/9 sizing
+            size=font_size,
             color="FF000000" if is_title else "FF333333",
         )
         cell.alignment = Alignment(
             horizontal="left", vertical="top", wrap_text=True,
         )
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=echo_col)
-        ws.row_dimensions[r].height = 28 if is_title else 24
+        # Estimate wrapped-line count; give each row enough height to fit.
+        effective_chars = int(chars_per_line * 0.88)
+        wrapped_lines = max(1, -(-len(line) // effective_chars))  # ceil div
+        ws.row_dimensions[r].height = int(wrapped_lines * font_size * line_height_pt) + 6
     explain_end_row = explain_start_row + len(explanation_lines) - 1
 
     # ----- Column widths -----
