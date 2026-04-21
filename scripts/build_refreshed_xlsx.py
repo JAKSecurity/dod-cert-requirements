@@ -219,11 +219,50 @@ LEFT_WRAP = Alignment(horizontal="left", vertical="center", wrap_text=True)
 DEFAULT_EXPLANATION_LINES: list[str] = [
     "",  # spacer
     "DoD 8140 Cybersecurity Workforce Qualification — Personal Certification Path",
-    "[PLACEHOLDER — narrative to be rewritten by Jeff. Edit this text directly in Excel (rows below the pending-review footnote); next rebuild will preserve your edits.]",
-    "Scope: certification-path qualifications only. Other paths (education, DoD training, commercial training, experience alternatives) are out of scope for this reference.",
-    "Source: DoD 8140 Foundational Qualification Matrix V2.1 (effective 2025-09-19), via www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices.",
-    "Note: CompTIA renamed CASP+ to SecurityX in 2024; both names refer to the same certification. This matrix shows it as \"SecX\".",
-    "Compiled by Jeff Krueger.",
+    (
+        "Governed by DoDM 8140.03 \"Cyberspace Workforce Qualification and Management Program\" (15 Feb 2023) — "
+        "https://dodcio.defense.gov/Portals/0/Documents/Library/DoDM-8140-03.pdf. "
+        "This matrix is compiled from the DoD 8140 Foundational Qualification Matrix V2.1 (effective 19 Sep 2025), "
+        "published at https://www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices."
+    ),
+    (
+        "Work roles: every IT and cyber-related DoD position is mapped to one or more \"work roles\" — "
+        "about 70 roles grouped into 7 workforce elements (Cybersecurity, IT, Cyber Enablers, Cyber Effects, "
+        "Intelligence, Software Engineering, Data/AI). A single individual may hold up to 3 work roles; qualification "
+        "is evaluated per role. See the DCWF at https://www.cyber.mil/dod-workforce-innovation-directorate/dod-cyber-workforce-framework. "
+        "Each role has three proficiency levels (Basic, Intermediate, Advanced) — a higher-level qualification also satisfies "
+        "lower levels within the same role."
+    ),
+    (
+        "Qualification paths: 8140 qualification can be met via one of four \"Foundational Qualification\" paths — "
+        "Education, DoD/Military Training, Commercial Training, or Personnel Certification — plus an \"Experience\" "
+        "alternative for eligible personnel. This matrix shows only the Personnel Certification path, which may be "
+        "the most practical route for anyone without an applicable degree or military schooling."
+    ),
+    (
+        "Education path: Bachelor's, Master's, or PhD in Information Technology, Cybersecurity, Data Science, "
+        "Information Systems, Computer Science, or Software Engineering from an ABET-accredited (abet.org) or "
+        "CAE-designated (caecommunity.org) institution. Bachelor's satisfies Basic and Intermediate levels; "
+        "Master's or PhD satisfies all three levels, including Advanced (a V2.1 change — previously TBD at Advanced). "
+        "Degree must be within the last 5 years with documented continuous cyberspace work since. See the "
+        "\"8140 Interim Education Qualification Options\" reference cited throughout the DoD matrix workbook for "
+        "additional considerations."
+    ),
+    (
+        "DoD / Military Training path: specific military schoolhouse courses listed per work role in the DoD 8140 "
+        "Training Repository (within the same workbook linked above). Generally not accessible to government civilians "
+        "or contractors unless previously completed during military service. Exception: CY 101 (40-hour online course) "
+        "satisfies qualification for all Cyber Enabler work roles — https://www.cyber.mil/training/cyber-101."
+    ),
+    (
+        "Commercial Training path: commercial courses approved as 8140 qualification options. "
+        "Thin option universe; most entries overlap with certifications."
+    ),
+    (
+        "Experience (alternative): available only to government civilians and military personnel. "
+        "Contractors are NOT eligible for the Experience path."
+    ),
+    "Compiled by Jeff Krueger. Unaffiliated with any firm, agency, or contracting office. Not legal advice.",
 ]
 
 # Sentinel pattern in the footnote row — used to locate the boundary
