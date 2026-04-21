@@ -189,11 +189,11 @@ def _write_section_header_row(row, headers: list[tuple[str, str | None]]) -> Non
         p.paragraph_format.space_after = Pt(0)
         run = p.add_run(text)
         run.bold = True
-        run.font.size = Pt(9)
+        run.font.size = Pt(10)
         if sup_marker:
             sup_run = p.add_run(sup_marker)
             sup_run.font.superscript = True
-            sup_run.font.size = Pt(8)
+            sup_run.font.size = Pt(9)
             sup_run.bold = True
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         _set_cell_borders(cell)
@@ -225,7 +225,7 @@ def _write_data_row(row, data_cells: list[list[tuple[str, bool]]],
             p.paragraph_format.space_after = Pt(0)
             p.paragraph_format.line_spacing = 1.0
             run = p.add_run(text)
-            run.font.size = Pt(8)
+            run.font.size = Pt(9)
             if is_red:
                 run.font.color.rgb = RGBColor(0xC0, 0x00, 0x00)
 
@@ -380,7 +380,8 @@ def build_docx(out_path: Path, baseline_blocks, provider_rows,
     for item in note_items:
         p = doc.add_paragraph(style=None)
         p.paragraph_format.left_indent = Inches(0.2)
-        p.paragraph_format.space_after = Pt(2)
+        p.paragraph_format.space_after = Pt(3)
+        p.paragraph_format.line_spacing = 1.1
         run = p.add_run("• " + item)
         run.font.size = Pt(8)
 
