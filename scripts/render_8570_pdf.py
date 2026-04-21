@@ -185,13 +185,15 @@ def _write_section_header_row(row, headers: list[tuple[str, str | None]]) -> Non
         cell.text = ""
         p = cell.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after = Pt(0)
         run = p.add_run(text)
         run.bold = True
-        run.font.size = Pt(10)
+        run.font.size = Pt(9)
         if sup_marker:
             sup_run = p.add_run(sup_marker)
             sup_run.font.superscript = True
-            sup_run.font.size = Pt(9)
+            sup_run.font.size = Pt(8)
             sup_run.bold = True
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         _set_cell_borders(cell)
@@ -221,8 +223,9 @@ def _write_data_row(row, data_cells: list[list[tuple[str, bool]]],
             p.alignment = WD_ALIGN_PARAGRAPH.LEFT
             p.paragraph_format.space_before = Pt(0)
             p.paragraph_format.space_after = Pt(0)
+            p.paragraph_format.line_spacing = 1.0
             run = p.add_run(text)
-            run.font.size = Pt(9)
+            run.font.size = Pt(8)
             if is_red:
                 run.font.color.rgb = RGBColor(0xC0, 0x00, 0x00)
 
@@ -335,24 +338,13 @@ def build_docx(out_path: Path, baseline_blocks, provider_rows,
     # Baseline table
     add_baseline_table(doc, baseline_blocks)
 
-    # Small spacer, then providers
-    spacer = doc.add_paragraph()
-    spacer.paragraph_format.space_after = Pt(0)
-    hdr = doc.add_paragraph()
-    hdr.paragraph_format.space_before = Pt(4)
-    hdr.paragraph_format.space_after = Pt(2)
-    run = hdr.add_run("IA Workforce Certification Providers")
-    run.bold = True
-    run.font.size = Pt(12)
-    add_provider_table(doc, provider_rows)
-
-    # Notes section
+    # ---- Notes (combines the old Notes, Provenance, and Why sections) ----
     notes_hdr = doc.add_paragraph()
-    notes_hdr.paragraph_format.space_before = Pt(8)
+    notes_hdr.paragraph_format.space_before = Pt(6)
     notes_hdr.paragraph_format.space_after = Pt(2)
     r = notes_hdr.add_run("Notes")
     r.bold = True
-    r.font.size = Pt(12)
+    r.font.size = Pt(11)
 
     note_items: list[str] = []
     note_items.append(
@@ -363,70 +355,51 @@ def build_docx(out_path: Path, baseline_blocks, provider_rows,
     note_items.append(
         "CASP+ / SecurityX: CompTIA renamed the CompTIA Advanced Security Practitioner "
         "(CASP+) certification to SecurityX on 17 December 2024, coinciding with the "
-        "release of exam version CAS-005 (V5). The two names refer to the same CompTIA-owned "
-        "certification; any reference to CASP+ in this document should be read as the "
-        "credential CompTIA now calls SecurityX."
+        "release of exam version CAS-005 (V5). Same credential; any reference to CASP+ "
+        "should be read as what CompTIA now calls SecurityX."
     )
     note_items.extend(footnotes)
+    note_items.append(
+        "Provenance: reproduced from a web.archive.org snapshot of "
+        "public.cyber.mil/wid/cwmp/dod-approved-8570-baseline-certifications/ "
+        "dated 2024-01-30 — the last publicly archived version of this page before DoD "
+        "removed it following the DoDM 8140.03 transition. "
+        "Archive URL: https://web.archive.org/web/20240130012654/"
+        "https://public.cyber.mil/wid/cwmp/dod-approved-8570-baseline-certifications/"
+    )
+    note_items.append(
+        "Why this document exists: DoD 8570.01-M was superseded by DoDM 8140.03 in 2023. "
+        "When public.cyber.mil removed the 8570 baseline page, the authoritative list that "
+        "many still-active contracts reference by name lost its public home. This document "
+        "preserves the list so contract officers, CORs, and compliance staff can still cite "
+        "an authoritative record. It is a reference reproduction, not a policy document. "
+        "For current cybersecurity workforce qualification requirements see DoDM 8140.03 "
+        "and the DoD Cyber Workforce Qualifications Matrices at "
+        "www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices."
+    )
     for item in note_items:
         p = doc.add_paragraph(style=None)
-        p.paragraph_format.left_indent = Inches(0.25)
+        p.paragraph_format.left_indent = Inches(0.2)
         p.paragraph_format.space_after = Pt(2)
         run = p.add_run("• " + item)
-        run.font.size = Pt(9)
+        run.font.size = Pt(8)
 
-    # Provenance
-    prov_hdr = doc.add_paragraph()
-    prov_hdr.paragraph_format.space_before = Pt(8)
-    prov_hdr.paragraph_format.space_after = Pt(2)
-    r = prov_hdr.add_run("Provenance")
+    # ---- Explicit page break so the Providers table starts on page 2 ----
+    break_para = doc.add_paragraph()
+    break_run = break_para.add_run()
+    from docx.enum.text import WD_BREAK
+    break_run.add_break(WD_BREAK.PAGE)
+
+    # ---- IA Workforce Certification Providers (page 2) ----
+    providers_hdr = doc.add_paragraph()
+    providers_hdr.paragraph_format.space_before = Pt(0)
+    providers_hdr.paragraph_format.space_after = Pt(4)
+    r = providers_hdr.add_run("IA Workforce Certification Providers")
     r.bold = True
     r.font.size = Pt(12)
-    for para in [
-        (
-            "Reproduced from a web.archive.org snapshot of "
-            "public.cyber.mil/wid/cwmp/dod-approved-8570-baseline-certifications/ "
-            "dated 2024-01-30, the last publicly archived version of this page "
-            "before DoD removed it following the DoDM 8140.03 transition."
-        ),
-        (
-            "Archive URL: https://web.archive.org/web/20240130012654/"
-            "https://public.cyber.mil/wid/cwmp/dod-approved-8570-baseline-certifications/"
-        ),
-    ]:
-        p = doc.add_paragraph()
-        p.paragraph_format.space_after = Pt(2)
-        run = p.add_run(para)
-        run.font.size = Pt(9)
+    add_provider_table(doc, provider_rows)
 
-    # Why this document exists
-    why_hdr = doc.add_paragraph()
-    why_hdr.paragraph_format.space_before = Pt(8)
-    why_hdr.paragraph_format.space_after = Pt(2)
-    r = why_hdr.add_run("Why this document exists")
-    r.bold = True
-    r.font.size = Pt(12)
-    for para in [
-        (
-            "DoD 8570.01-M was superseded by DoDM 8140.03 in 2023. When public.cyber.mil "
-            "removed the 8570 baseline page, the authoritative list that many still-active "
-            "contracts reference by name lost its public home. This document preserves that "
-            "list so contract officers, CORs, and compliance staff can still cite an "
-            "authoritative record."
-        ),
-        (
-            "This is a reference reproduction. It is not a policy document. For current "
-            "cybersecurity workforce qualification requirements, see DoDM 8140.03 and the "
-            "DoD Cyber Workforce Qualifications Matrices at "
-            "www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices."
-        ),
-    ]:
-        p = doc.add_paragraph()
-        p.paragraph_format.space_after = Pt(2)
-        run = p.add_run(para)
-        run.font.size = Pt(9)
-
-    # Compiled by — at the very end
+    # ---- Compiled by — at the very end ----
     tail = doc.add_paragraph()
     tail.paragraph_format.space_before = Pt(10)
     tail.alignment = WD_ALIGN_PARAGRAPH.RIGHT
