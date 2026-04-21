@@ -74,6 +74,54 @@ def test_build_produces_single_consolidated_sheet(tmp_path):
     assert wb.sheetnames == ["Certification Analysis"]
 
 
+def test_narrative_rows_are_preserved_on_rebuild(tmp_path):
+    """Jeff's workflow: edit narrative directly in Excel below the footnote,
+    then rebuild. His edits must survive."""
+    out = tmp_path / "out.xlsx"
+    # First build
+    build(FIXTURE, out)
+    # Edit the narrative: replace the placeholder block with Jeff-style prose
+    wb = load_workbook(out)
+    ws = wb["Certification Analysis"]
+    footnote_row = None
+    for r in range(1, ws.max_row + 1):
+        v = ws.cell(row=r, column=1).value
+        if v and "pending DoD review" in str(v):
+            footnote_row = r
+            break
+    assert footnote_row is not None
+    # Clear existing narrative rows, replace with custom text
+    for r in range(footnote_row + 1, ws.max_row + 2):
+        ws.cell(row=r, column=1).value = None
+    ws.cell(row=footnote_row + 1, column=1).value = "My Custom Title"
+    ws.cell(row=footnote_row + 2, column=1).value = "Custom paragraph 1."
+    ws.cell(row=footnote_row + 3, column=1).value = "Custom paragraph 2."
+    wb.save(out)
+    wb.close()
+    # Second build against same output path
+    build(FIXTURE, out)
+    wb2 = load_workbook(out, data_only=True)
+    ws2 = wb2["Certification Analysis"]
+    # Find new footnote row (may differ if matrix changed)
+    new_footnote_row = None
+    for r in range(1, ws2.max_row + 1):
+        v = ws2.cell(row=r, column=1).value
+        if v and "pending DoD review" in str(v):
+            new_footnote_row = r
+            break
+    assert new_footnote_row is not None
+    # Custom narrative must be present
+    narrative_text = " ".join(
+        str(ws2.cell(row=r, column=1).value or "")
+        for r in range(new_footnote_row + 1, ws2.max_row + 1)
+    )
+    assert "My Custom Title" in narrative_text
+    assert "Custom paragraph 1." in narrative_text
+    assert "Custom paragraph 2." in narrative_text
+    # AND the placeholder default should NOT be there (user's edits won)
+    assert "[PLACEHOLDER" not in narrative_text
+
+
 def test_explanation_block_lives_below_matrix_footnote(tmp_path):
     out = tmp_path / "out.xlsx"
     build(FIXTURE, out)

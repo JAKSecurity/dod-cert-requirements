@@ -211,18 +211,60 @@ CENTER = Alignment(horizontal="center", vertical="center", wrap_text=True)
 LEFT_WRAP = Alignment(horizontal="left", vertical="center", wrap_text=True)
 
 
-# Explanation block that lives below the matrix (same sheet, same printed page).
-# Kept compact so the full 11x17 landscape page can hold matrix + this block.
-# Jeff rewrites the PLACEHOLDER when ready to publish.
-EXPLANATION_LINES: list[str] = [
+# Default Explanation block used on the FIRST build of an output xlsx.
+# On subsequent rebuilds, if the output file already exists, the builder
+# preserves whatever text Jeff has typed into the rows below the
+# pending-review footnote (the footnote text serves as the sentinel).
+# Jeff edits the narrative directly in Excel — no code changes needed.
+DEFAULT_EXPLANATION_LINES: list[str] = [
     "",  # spacer
     "DoD 8140 Cybersecurity Workforce Qualification — Personal Certification Path",
-    "[PLACEHOLDER — narrative to be rewritten by Jeff.]",
+    "[PLACEHOLDER — narrative to be rewritten by Jeff. Edit this text directly in Excel (rows below the pending-review footnote); next rebuild will preserve your edits.]",
     "Scope: certification-path qualifications only. Other paths (education, DoD training, commercial training, experience alternatives) are out of scope for this reference.",
     "Source: DoD 8140 Foundational Qualification Matrix V2.1 (effective 2025-09-19), via www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices.",
     "Note: CompTIA renamed CASP+ to SecurityX in 2024; both names refer to the same certification. This matrix shows it as \"SecX\".",
     "Compiled by Jeff Krueger.",
 ]
+
+# Sentinel pattern in the footnote row — used to locate the boundary
+# between generated matrix content and user-editable narrative.
+FOOTNOTE_SENTINEL = "pending DoD review"
+
+
+def _read_existing_narrative(output_path: str | Path) -> list[str] | None:
+    """If an output xlsx already exists, return the narrative lines the user
+    has authored below the pending-review footnote. Returns None if the file
+    is absent or unreadable (first build, or sheet structure changed) — the
+    caller falls back to DEFAULT_EXPLANATION_LINES in that case."""
+    p = Path(output_path)
+    if not p.exists():
+        return None
+    try:
+        wb = load_workbook(p, data_only=True)
+    except Exception:
+        return None
+    if "Certification Analysis" not in wb.sheetnames:
+        wb.close()
+        return None
+    ws = wb["Certification Analysis"]
+    footnote_row = None
+    for r in range(1, ws.max_row + 1):
+        v = ws.cell(row=r, column=1).value
+        if v and FOOTNOTE_SENTINEL in str(v):
+            footnote_row = r
+            break
+    if footnote_row is None:
+        wb.close()
+        return None
+    narrative: list[str] = []
+    for r in range(footnote_row + 1, ws.max_row + 1):
+        v = ws.cell(row=r, column=1).value
+        narrative.append(str(v) if v is not None else "")
+    wb.close()
+    # Trim trailing empties so we don't grow the output file by a blank per build.
+    while narrative and not narrative[-1]:
+        narrative.pop()
+    return narrative if narrative else None
 
 
 def _vendor_short_name(v: str) -> str:
@@ -360,6 +402,7 @@ def write_pivot_sheet(
     wb: Workbook,
     role_catalog: dict,
     rows: list[dict],
+    narrative_lines: list[str] | None = None,
 ) -> None:
     ws = wb.create_sheet("Certification Analysis")
 
@@ -571,15 +614,22 @@ def write_pivot_sheet(
     ws.row_dimensions[footnote_row].height = 26
 
     # ----- Explanation block (below footnote, same printed page) -----
+    # Narrative lines come either from an existing xlsx (preserving Jeff's
+    # direct edits in Excel) or from DEFAULT_EXPLANATION_LINES on first build.
+    explanation_lines = (
+        narrative_lines if narrative_lines is not None else DEFAULT_EXPLANATION_LINES
+    )
     explain_start_row = footnote_row + 1
-    for i, line in enumerate(EXPLANATION_LINES):
+    first_nonempty_seen = False
+    for i, line in enumerate(explanation_lines):
         r = explain_start_row + i
         cell = ws.cell(row=r, column=1, value=line if line else None)
         if not line:
             ws.row_dimensions[r].height = 6  # thin spacer
             continue
-        # First explanation line (after spacer) is the title — bolder, slightly larger
-        is_title = (i == 1)
+        # First non-empty line of the narrative is styled as the title.
+        is_title = not first_nonempty_seen
+        first_nonempty_seen = True
         cell.font = Font(
             bold=is_title,
             italic=not is_title,
@@ -591,7 +641,7 @@ def write_pivot_sheet(
         )
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=echo_col)
         ws.row_dimensions[r].height = 14 if is_title else 12
-    explain_end_row = explain_start_row + len(EXPLANATION_LINES) - 1
+    explain_end_row = explain_start_row + len(explanation_lines) - 1
 
     # ----- Column widths -----
     ws.column_dimensions["A"].width = 47
@@ -635,10 +685,14 @@ def build(v21_xlsx_path: str | Path, output_path: str | Path) -> None:
     rows = read_v21_certification_rows(v21_xlsx_path)
     role_catalog = build_role_catalog(rows)
 
+    # Preserve Jeff's narrative edits from a prior output, if present.
+    # First build (or after structure change) falls back to defaults.
+    preserved_narrative = _read_existing_narrative(output_path)
+
     wb = Workbook()
     wb.remove(wb.active)
     # Single consolidated sheet: matrix + explanation below it = 1-page PDF.
-    write_pivot_sheet(wb, role_catalog, rows)
+    write_pivot_sheet(wb, role_catalog, rows, narrative_lines=preserved_narrative)
     wb.properties.creator = "Jeff Krueger"
     wb.properties.lastModifiedBy = "Jeff Krueger"
     wb.properties.title = "DoD 8140.03 Cert Path Reference"
