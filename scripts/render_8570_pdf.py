@@ -196,19 +196,28 @@ def pandoc_markdown_to_docx(md_path: Path, docx_path: Path) -> None:
 
 
 def word_docx_to_pdf_with_grid(docx_path: Path, pdf_path: Path) -> None:
-    """Open DOCX in Word, apply grid lines to every table, export to PDF."""
+    """Open DOCX in Word, apply grid lines to every table, export to PDF.
+
+    Uses dynamic dispatch to avoid pywin32 gencache issues that can
+    cause 'Open.Close' AttributeError when a stale cached wrapper class
+    is resolved for Word.Application."""
     import win32com.client  # type: ignore[import-untyped]
+    import win32com.client.dynamic
 
     # Word border constants
     WD_LINE_STYLE_SINGLE = 1
+    WD_ALERTS_NONE = 0
     BORDER_IDS = (-1, -2, -3, -4, -5, -6)  # top/left/bottom/right/horiz/vert
 
-    word = win32com.client.Dispatch("Word.Application")
+    word = win32com.client.dynamic.Dispatch("Word.Application")
     word.Visible = False
+    word.DisplayAlerts = WD_ALERTS_NONE
     try:
-        doc = word.Documents.Open(str(docx_path.resolve()))
+        doc = word.Documents.Open(FileName=str(docx_path.resolve()),
+                                  ConfirmConversions=False,
+                                  ReadOnly=False,
+                                  AddToRecentFiles=False)
         try:
-            # Apply grid lines (major + minor) to every table
             for t in doc.Tables:
                 t.Borders.Enable = True
                 for bid in BORDER_IDS:
@@ -217,9 +226,9 @@ def word_docx_to_pdf_with_grid(docx_path: Path, pdf_path: Path) -> None:
                         t.Borders(bid).LineWidth = 4  # 1pt
                     except Exception:
                         pass
-            doc.SaveAs2(str(pdf_path.resolve()), FileFormat=17)
+            doc.SaveAs2(FileName=str(pdf_path.resolve()), FileFormat=17)
         finally:
-            doc.Close(SaveChanges=False)
+            doc.Close(SaveChanges=0)
     finally:
         word.Quit()
 
@@ -233,7 +242,9 @@ def render_pdf(html_path: str | Path, out_pdf: str | Path) -> Path:
     provider_md = extract_provider_table(provider)
     footnotes = extract_footnotes(soup)
     doc_md = build_markdown(baseline_blocks, provider_md, footnotes)
-    with tempfile.TemporaryDirectory() as tmp:
+    # ignore_cleanup_errors handles Windows/Word's brief post-Quit file lock
+    # that occasionally fails tempdir cleanup even after the PDF is saved.
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
         tmp_dir = Path(tmp)
         md_path = tmp_dir / "8570.md"
         docx_path = tmp_dir / "8570.docx"
