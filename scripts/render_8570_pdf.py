@@ -101,8 +101,13 @@ def extract_provider_table(provider_table) -> str:
 
 
 def extract_footnotes(soup: BeautifulSoup) -> list[str]:
-    """Return the three policy-relevant footnote paragraphs."""
-    keys = ("The GIAC GSE", "* This organization", "** CySA+")
+    """Return the policy-relevant footnote paragraphs from the archive.
+
+    The DoD page had three footnotes; we keep two (GSE/GISF removal and
+    CySA+ name change) and drop the generic vendor-ownership disclaimer
+    ('* This organization is the sole propriety owner ...') which adds
+    no information for this reference's readers."""
+    keys = ("The GIAC GSE", "** CySA+")
     out: list[str] = []
     for p in soup.find_all("p"):
         text = p.get_text(" ", strip=True)
