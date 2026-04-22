@@ -81,13 +81,17 @@ def normalize_xlsx(path: str | Path) -> list[MatrixRecord]:
 
 
 if __name__ == "__main__":
-    src = (
-        Path(sys.argv[1])
-        if len(sys.argv) > 1
-        else Path(
-            r"C:\Users\jak36\Documents\BAH\8140 Education and Certification Requirements - Jan 2025 Update.xlsx"
+    if len(sys.argv) < 2:
+        sys.stderr.write(
+            "usage: python -m scripts.normalize_jan2025_xlsx PATH_TO_JAN2025_XLSX\n"
+            "\n"
+            "This script produces the informational CHANGELOG only. The author's\n"
+            "private Jan 2025 working version is not committed to this repo; if\n"
+            "you don't have access to it, you don't need to run this script —\n"
+            "the published 8140/CHANGELOG.md is already generated.\n"
         )
-    )
+        sys.exit(2)
+    src = Path(sys.argv[1])
     out = Path("data/jan2025.json")
     out.parent.mkdir(exist_ok=True)
     records = normalize_xlsx(src)
