@@ -380,8 +380,7 @@ def build_docx(out_path: Path, baseline_blocks, provider_rows,
     )
     bullet(
         "Red-font entries in the matrix (HCISPP, CCSP) were flagged by DoD as recent "
-        "additions to the approved list at time of publication. That currency note is "
-        "no longer meaningful in this 2024-snapshot reproduction."
+        "additions to the approved list at time of publication."
     )
     bullet(
         "CASP+ / SecurityX: CompTIA renamed the CompTIA Advanced Security Practitioner "
