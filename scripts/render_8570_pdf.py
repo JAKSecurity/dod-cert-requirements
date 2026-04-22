@@ -129,10 +129,15 @@ def parse_provider_table(table) -> list[tuple[str, str]]:
 
 
 def parse_footnotes(soup: BeautifulSoup) -> list[str]:
-    """Return DoD's substantive footnotes from the source page
-    (GSE/GISF removal + CySA+/CSA+ rename). Drops the generic vendor-
-    ownership boilerplate."""
-    keys = ("The GIAC GSE", "** CySA+")
+    """Return DoD's substantive footnotes from the source page:
+    - "1." and "2." numbered notes referenced by superscripts in the
+      section headers (CSSP category rename, CCNA-Security rebrand);
+    - "The GIAC GSE..." (GSE/GISF removal);
+    - "** CySA+..." (CySA+/CSA+ rename).
+
+    Drops the generic "* This organization is the sole propriety owner..."
+    boilerplate — adds no value for this reference."""
+    keys = ("1. ", "2. ", "The GIAC GSE", "** CySA+")
     out: list[str] = []
     for p in soup.find_all("p"):
         text = p.get_text(" ", strip=True)
@@ -189,10 +194,13 @@ def _write_section_header_row(row, headers: list[tuple[str, str | None]]) -> Non
         run = p.add_run(text)
         run.bold = True
         run.font.size = Pt(10)
-        # Source HTML had superscript footnote markers (1, 2) on some
-        # section headers tied to legacy DoD notes we no longer carry.
-        # Drop them — not meaningful in this reference copy.
-        _ = sup_marker
+        # Preserve the superscript footnote markers (1, 2) from the source
+        # DoD page — they link to the numbered footnotes in the Notes block.
+        if sup_marker:
+            sup_run = p.add_run(sup_marker)
+            sup_run.font.superscript = True
+            sup_run.font.size = Pt(9)
+            sup_run.bold = True
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
         _set_cell_borders(cell)
         _set_cell_header_shading(cell)
@@ -224,9 +232,11 @@ def _write_data_row(row, data_cells: list[list[tuple[str, bool]]],
             p.paragraph_format.line_spacing = 1.0
             run = p.add_run(text)
             run.font.size = Pt(9)
-            # Red font in the original DoD page flagged recent additions;
-            # not meaningful for a 2024 snapshot, so render all certs black.
-            _ = is_red  # retained from parser for future use; no visual effect
+            # Preserve the red-font markers from the original DoD page
+            # (certs that were recent additions at time of publication).
+            # Explained in the Notes section below the matrix.
+            if is_red:
+                run.font.color.rgb = RGBColor(0xC0, 0x00, 0x00)
 
 
 def add_baseline_table(doc, blocks) -> None:
@@ -337,35 +347,41 @@ def build_docx(out_path: Path, baseline_blocks, provider_rows,
     # Baseline table
     add_baseline_table(doc, baseline_blocks)
 
-    def section_header(text: str, space_before: int = 6) -> None:
+    def section_header(text: str, space_before: int = 4) -> None:
         h = doc.add_paragraph()
         h.paragraph_format.space_before = Pt(space_before)
-        h.paragraph_format.space_after = Pt(2)
+        h.paragraph_format.space_after = Pt(1)
         r = h.add_run(text)
         r.bold = True
-        r.font.size = Pt(11)
+        r.font.size = Pt(10)
 
     def bullet(text: str) -> None:
         p = doc.add_paragraph(style=None)
         p.paragraph_format.left_indent = Inches(0.2)
-        p.paragraph_format.space_after = Pt(3)
-        p.paragraph_format.line_spacing = 1.1
+        p.paragraph_format.space_after = Pt(2)
+        p.paragraph_format.line_spacing = 1.05
         r = p.add_run("• " + text)
         r.font.size = Pt(8)
 
     def body(text: str) -> None:
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(2)
-        p.paragraph_format.line_spacing = 1.1
+        p.paragraph_format.line_spacing = 1.05
         r = p.add_run(text)
         r.font.size = Pt(8)
 
-    # ---- Notes (original footnotes + our two annotations) ----
+    # ---- Notes (original DoD footnotes + our annotations) ----
     section_header("Notes")
     bullet(
         "This document reproduces the DoD 8570 Approved Baseline Certifications list "
-        "as DoD last published it (snapshot date below). Cert names and vendor branding "
-        "are preserved as written; some have changed since."
+        "as DoD last published it (snapshot date below). Cert names, vendor branding, "
+        "red-font markers, and superscript footnote references are preserved as "
+        "originally published; some annotations may no longer be current."
+    )
+    bullet(
+        "Red-font entries in the matrix (HCISPP, CCSP) were flagged by DoD as recent "
+        "additions to the approved list at time of publication. That currency note is "
+        "no longer meaningful in this 2024-snapshot reproduction."
     )
     bullet(
         "CASP+ / SecurityX: CompTIA renamed the CompTIA Advanced Security Practitioner "
@@ -389,19 +405,6 @@ def build_docx(out_path: Path, baseline_blocks, provider_rows,
         "https://public.cyber.mil/wid/cwmp/dod-approved-8570-baseline-certifications/"
     )
 
-    # ---- Why this document exists ----
-    section_header("Why this document exists")
-    body(
-        "DoD 8570.01-M was superseded by DoDM 8140.03 in 2023. When public.cyber.mil "
-        "removed the 8570 baseline page, the authoritative list that many still-active "
-        "contracts reference by name lost its public home. This document preserves the "
-        "list so contract officers, CORs, and compliance staff can still cite an "
-        "authoritative record. It is a reference reproduction, not a policy document. "
-        "For current cybersecurity workforce qualification requirements see DoDM 8140.03 "
-        "and the DoD Cyber Workforce Qualifications Matrices at "
-        "www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices."
-    )
-
     # ---- Explicit page break so the Providers table starts on page 2 ----
     break_para = doc.add_paragraph()
     break_run = break_para.add_run()
@@ -416,6 +419,19 @@ def build_docx(out_path: Path, baseline_blocks, provider_rows,
     r.bold = True
     r.font.size = Pt(12)
     add_provider_table(doc, provider_rows)
+
+    # ---- Why this document exists (bottom of page 2) ----
+    section_header("Why this document exists", space_before=10)
+    body(
+        "DoD 8570.01-M was superseded by DoDM 8140.03 in 2023. When public.cyber.mil "
+        "removed the 8570 baseline page, the authoritative list that many still-active "
+        "contracts reference by name lost its public home. This document preserves the "
+        "list so contract officers, CORs, and compliance staff can still cite an "
+        "authoritative record. It is a reference reproduction, not a policy document. "
+        "For current cybersecurity workforce qualification requirements see DoDM 8140.03 "
+        "and the DoD Cyber Workforce Qualifications Matrices at "
+        "www.cyber.mil/dod-workforce-innovation-directorate/dod8140/qualification-matrices."
+    )
 
     # ---- Compiled by — at the very end ----
     tail = doc.add_paragraph()
